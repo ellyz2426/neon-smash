@@ -246,6 +246,28 @@
               "class": "btn-tutorial"
             },
             "dataUid": "uid-23"
+          },
+          {
+            "type": "container",
+            "sourceTag": "div",
+            "children": [
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "HISTORY"
+                ],
+                "properties": {
+                  "class": "btn-small-text"
+                },
+                "dataUid": "uid-26"
+              }
+            ],
+            "properties": {
+              "id": "btn-history",
+              "class": "btn-small"
+            },
+            "dataUid": "uid-25"
           }
         ],
         "properties": {
@@ -505,7 +527,7 @@
         "column": 0
       },
       "end": {
-        "line": 114,
+        "line": 115,
         "column": 6
       }
     },
@@ -715,7 +737,7 @@
         "column": 2
       },
       "end": {
-        "line": 113,
+        "line": 114,
         "column": 8
       }
     },
@@ -737,6 +759,26 @@
       "end": {
         "line": 112,
         "column": 95
+      }
+    },
+    "uid-25": {
+      "start": {
+        "line": 113,
+        "column": 4
+      },
+      "end": {
+        "line": 113,
+        "column": 93
+      }
+    },
+    "uid-26": {
+      "start": {
+        "line": 113,
+        "column": 44
+      },
+      "end": {
+        "line": 113,
+        "column": 87
       }
     }
   }

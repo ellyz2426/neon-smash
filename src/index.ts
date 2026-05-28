@@ -1,4 +1,4 @@
-// Neon Smash VR — Main Entry Point (Round 3: power-ups, challenges, tutorial, enhanced FX)
+// Neon Smash VR — Main Entry Point (Round 4: moving targets, haptics, match history, streak)
 import {
   World, PanelUI, Follower, FollowBehavior, ScreenSpace,
   PanelDocument, Vector3, Raycaster, Vector2,
@@ -25,6 +25,10 @@ import {
   generateDailyChallenge, isChallengeCompleted, markChallengeCompleted,
   getChallengeStreak, getChallengeConfig, DailyChallenge, ChallengeGameConfig,
 } from './challenges';
+import {
+  addMatchRecord, loadMatchHistory, formatMatchSummary, formatMatchDetail,
+  formatMatchDate,
+} from './history';
 
 // === Globals ===
 let world: World;
@@ -84,6 +88,12 @@ let rightHandUsed = false;
 
 // Power-up expiry warning
 let lastPowerUpWarning = 0;
+
+// Haptic feedback
+let xrSession: any = null;
+
+// Streak tracking
+let currentStreak = 0; // consecutive games with score improvement
 
 // === Entry Point ===
 async function main() {
@@ -193,6 +203,9 @@ function setupUI() {
     { id: 'powerup', config: '/ui/powerup.json', maxW: 0.35, maxH: 0.08, mode: 'follower' },
     { id: 'challenge', config: '/ui/challenge.json', maxW: 0.85, maxH: 0.8, mode: 'world' },
     { id: 'tutorial', config: '/ui/tutorial.json', maxW: 0.8, maxH: 0.6, mode: 'world' },
+    // Round 4 panels
+    { id: 'history', config: '/ui/history.json', maxW: 0.85, maxH: 0.9, mode: 'world' },
+    { id: 'streak', config: '/ui/streak.json', maxW: 0.2, maxH: 0.06, mode: 'follower' },
   ];
 
   panels.forEach(p => {
@@ -210,6 +223,7 @@ function setupUI() {
         case 'combo': offY = -0.08; offX = -0.2; break;
         case 'toast': offY = -0.12; break;
         case 'powerup': offY = 0.16; offX = -0.18; break;
+        case 'streak': offY = -0.04; offX = 0.22; break;
       }
       entity.addComponent(Follower, {
         target: world.player.head,
@@ -272,6 +286,7 @@ function bindUIEvents() {
   // Round 3 buttons
   bindBtn(titleDoc, 'btn-challenge', () => { audio.playButtonClick(); populateChallenge(); changeState('challenge'); });
   bindBtn(titleDoc, 'btn-tutorial', () => { audio.playButtonClick(); tutorialStep = 0; populateTutorial(); changeState('tutorial'); });
+  bindBtn(titleDoc, 'btn-history', () => { audio.playButtonClick(); populateHistory(); changeState('history'); });
 
   // Mode select
   const modeDoc = getDoc('modeselect');
@@ -308,7 +323,7 @@ function bindUIEvents() {
   }
 
   // Back buttons
-  ['leaderboard', 'achievements', 'settings', 'help', 'stats', 'skins'].forEach(id => {
+  ['leaderboard', 'achievements', 'settings', 'help', 'stats', 'skins', 'history'].forEach(id => {
     const doc = getDoc(id);
     if (doc) bindBtn(doc, `btn-back-${id}`, () => { audio.playButtonClick(); changeState('title'); });
   });
@@ -366,6 +381,22 @@ function bindUIEvents() {
 function bindBtn(doc: UIKitDocument, id: string, fn: () => void): void {
   const el = doc.getElementById(id);
   if (el) el.addEventListener('click', fn);
+}
+
+// === Haptic Feedback ===
+function triggerHaptic(hand: 'left' | 'right', intensity = 0.5, duration = 50): void {
+  try {
+    const xrInput = (world.input as any).xr;
+    if (!xrInput) return;
+    const gamepad = hand === 'left' ? xrInput.gamepads?.left : xrInput.gamepads?.right;
+    if (gamepad?.hapticActuators?.[0]) {
+      gamepad.hapticActuators[0].pulse(intensity, duration);
+    } else if (gamepad?.vibrationActuator) {
+      gamepad.vibrationActuator.playEffect('dual-rumble', {
+        duration, strongMagnitude: intensity, weakMagnitude: intensity * 0.5,
+      });
+    }
+  } catch { /* XR haptics not available */ }
 }
 
 // === State Changes ===
@@ -426,6 +457,9 @@ function changeState(newState: GameState) {
       break;
     case 'tutorial':
       showUI('tutorial');
+      break;
+    case 'history':
+      showUI('history');
       break;
   }
 }
@@ -538,6 +572,9 @@ function update(dt: number, t: number) {
   } else {
     if (uiEntities['combo']) uiEntities['combo'].object3D!.visible = false;
   }
+
+  // Streak display
+  updateStreakDisplay();
 
   // Power-up HUD
   if (state === 'playing' && powerups.hasActiveEffect()) {
@@ -714,6 +751,17 @@ function gameOver(completed: boolean) {
   });
 
   checkAchievements();
+
+  // Record to match history
+  addMatchRecord({
+    mode: gsm.mode, difficulty: gsm.difficulty, score: gsm.score,
+    hits: gsm.hits, misses: gsm.misses, accuracy: gsm.getAccuracy(),
+    maxCombo: gsm.maxCombo, waveReached: gsm.wave,
+    timeElapsed: gsm.timeElapsed, goldenHits: gsm.goldenHits,
+    bombsHit: gsm.bombsHit, perfectWaves: gsm.perfectWaves,
+    completed, isChallenge: isPlayingChallenge,
+  });
+
   changeState('gameover');
 }
 
@@ -783,8 +831,8 @@ function setupBrowserInput(container: HTMLDivElement) {
 function performStrike(hand: 'left' | 'right' | 'browser' = 'browser') {
   if (state !== 'playing') return;
 
-  if (hand === 'left') { leftHandUsed = true; gsm.leftHandHits++; }
-  if (hand === 'right') { rightHandUsed = true; gsm.rightHandHits++; }
+  if (hand === 'left') { leftHandUsed = true; gsm.leftHandHits++; triggerHaptic('left', 0.3, 30); }
+  if (hand === 'right') { rightHandUsed = true; gsm.rightHandHits++; triggerHaptic('right', 0.3, 30); }
 
   // Raycast from camera
   try {
@@ -858,7 +906,7 @@ function performStrike(hand: 'left' | 'right' | 'browser' = 'browser') {
     }
 
     if (closestTarget) {
-      hitTarget(closestTarget);
+      hitTarget(closestTarget, hand);
       hitSomething = true;
     }
   }
@@ -871,7 +919,7 @@ function performStrike(hand: 'left' | 'right' | 'browser' = 'browser') {
   if (leftHandUsed && rightHandUsed) tryAchievement('dual_wield');
 }
 
-function hitTarget(target: ActiveTarget) {
+function hitTarget(target: ActiveTarget, hand: 'left' | 'right' | 'browser' = 'browser') {
   const config = target.config;
   const pos = target.group.position.clone();
 
@@ -882,6 +930,7 @@ function hitTarget(target: ActiveTarget) {
       particles.burst(pos, 0x44ff88, 12, 3, 0.4);
       audio.playHit(1);
       targetSystem.removeTarget(target, world.scene);
+      if (hand !== 'browser') triggerHaptic(hand, 0.4, 40);
       return;
     }
 
@@ -894,6 +943,8 @@ function hitTarget(target: ActiveTarget) {
     shatterFx.shatter(pos, 0xff0000, 12, 1.2);
     screenShake.trigger(0.04);
     showToast(`BOMB! ${config.points}`);
+    // Strong haptic for bomb
+    if (hand !== 'browser') triggerHaptic(hand, 1.0, 150);
     if (gsm.mode !== GameMode.SpeedRush && gsm.mode !== GameMode.Precision) {
       if (gsm.loseLife()) {
         audio.playLifeLost();
@@ -913,6 +964,7 @@ function hitTarget(target: ActiveTarget) {
     particles.burst(pos, config.color, 6, 2, 0.3);
     shatterFx.shatter(pos, config.color, 4, 0.5);
     showToast('CRACK!');
+    if (hand !== 'browser') triggerHaptic(hand, 0.6, 60);
     return;
   }
 
@@ -935,6 +987,7 @@ function hitTarget(target: ActiveTarget) {
       particles.burst(pos, 0xffd700, 18, 4, 0.7);
       particles.ring(pos, 0xffd700, 12);
       shatterFx.shatter(pos, 0xffd700, 8, 1.0);
+      if (hand !== 'browser') triggerHaptic(hand, 0.7, 80);
       break;
     case 'chain':
       gsm.chainCompletes++;
@@ -942,11 +995,13 @@ function hitTarget(target: ActiveTarget) {
       particles.burst(pos, 0x00ff88, 15, 3, 0.5);
       shatterFx.shatter(pos, 0x00ff88, 6, 0.7);
       tryAchievement('chain_complete');
+      if (hand !== 'browser') triggerHaptic(hand, 0.5, 60);
       break;
     default:
       audio.playHit(config.points / 100);
       particles.burst(pos, config.color, 12, 3, 0.5);
       shatterFx.shatter(pos, config.color, 6, 0.6);
+      if (hand !== 'browser') triggerHaptic(hand, 0.4, 40);
       break;
   }
 
@@ -1184,6 +1239,49 @@ function checkAchievements() {
   if (stats.totalTargetsSmashed >= 1000) tryAchievement('total_1000');
   if (stats.totalGamesPlayed >= 10) tryAchievement('games_10');
   if (stats.totalGamesPlayed >= 50) tryAchievement('games_50');
+}
+
+// === Match History ===
+function populateHistory() {
+  const doc = getDoc('history');
+  if (!doc) return;
+  const history = loadMatchHistory();
+  for (let i = 0; i < 8; i++) {
+    const m = history[i];
+    setText(doc, `hist-rank-${i}`, `${i + 1}.`);
+    if (m) {
+      setText(doc, `hist-summary-${i}`, formatMatchSummary(m));
+      setText(doc, `hist-detail-${i}`, formatMatchDetail(m));
+      setText(doc, `hist-date-${i}`, formatMatchDate(m.date));
+    } else {
+      setText(doc, `hist-summary-${i}`, '---');
+      setText(doc, `hist-detail-${i}`, '---');
+      setText(doc, `hist-date-${i}`, '');
+    }
+  }
+}
+
+// === Streak Display ===
+function updateStreakDisplay() {
+  if (state !== 'playing' || gsm.combo < 1) {
+    if (uiEntities['streak']) uiEntities['streak'].object3D!.visible = false;
+    return;
+  }
+  // Show streak at 3+ combo
+  if (gsm.combo >= 3) {
+    if (uiEntities['streak']) uiEntities['streak'].object3D!.visible = true;
+    const doc = getDoc('streak');
+    if (doc) {
+      setText(doc, 'streak-count', `${gsm.combo}`);
+      // Escalate icon based on combo tier
+      if (gsm.combo >= 25) setText(doc, 'streak-icon', '💥');
+      else if (gsm.combo >= 15) setText(doc, 'streak-icon', '⚡');
+      else if (gsm.combo >= 10) setText(doc, 'streak-icon', '🔥');
+      else setText(doc, 'streak-icon', '🎯');
+    }
+  } else {
+    if (uiEntities['streak']) uiEntities['streak'].object3D!.visible = false;
+  }
 }
 
 // === Start ===

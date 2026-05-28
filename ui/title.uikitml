@@ -111,5 +111,6 @@
   </div>
   <div class="btn-row">
     <div id="btn-tutorial" class="btn-tutorial"><span class="btn-tutorial-text">TRAINING</span></div>
+    <div id="btn-history" class="btn-small"><span class="btn-small-text">HISTORY</span></div>
   </div>
 </div>

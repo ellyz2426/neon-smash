@@ -2,7 +2,7 @@
 import { Vector3 } from '@iwsdk/core';
 
 // === Game States ===
-export type GameState = 'title' | 'modeselect' | 'difficulty' | 'countdown' | 'playing' | 'paused' | 'gameover' | 'leaderboard' | 'achievements' | 'settings' | 'help' | 'stats' | 'skins' | 'challenge' | 'tutorial';
+export type GameState = 'title' | 'modeselect' | 'difficulty' | 'countdown' | 'playing' | 'paused' | 'gameover' | 'leaderboard' | 'achievements' | 'settings' | 'help' | 'stats' | 'skins' | 'challenge' | 'tutorial' | 'history';
 
 // === Target Types ===
 export enum TargetType {

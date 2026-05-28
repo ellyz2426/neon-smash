@@ -1,4 +1,4 @@
-// Neon Smash VR — Target System
+// Neon Smash VR — Target System (Round 4: moving target patterns)
 import {
   Mesh, Group, SphereGeometry, BoxGeometry, ConeGeometry,
   OctahedronGeometry, IcosahedronGeometry, TorusGeometry,
@@ -7,6 +7,7 @@ import {
   Vector3, Color, AdditiveBlending,
 } from '@iwsdk/core';
 import { TargetType, TARGET_CONFIGS, TargetConfig, Difficulty, DIFFICULTY_CONFIGS, GameMode } from './types';
+import { MovementConfig, MovementPattern, pickMovementPattern, applyMovement } from './movement';
 
 export interface ActiveTarget {
   group: Group;
@@ -21,6 +22,8 @@ export interface ActiveTarget {
   alive: boolean;
   chainIndex?: number; // for chain targets
   spawnAnim: number; // 0-1 for pop-up animation
+  movement: MovementConfig; // movement pattern
+  basePosition: Vector3; // original pylon position for movement offsets
 }
 
 export class TargetSystem {
@@ -122,7 +125,7 @@ export class TargetSystem {
     return { mesh, glow, edges };
   }
 
-  spawnTarget(pylonIndex: number, pylonPos: Vector3, config: TargetConfig, chainIndex?: number): ActiveTarget {
+  spawnTarget(pylonIndex: number, pylonPos: Vector3, config: TargetConfig, chainIndex?: number, wave = 1, diffMult = 1): ActiveTarget {
     const { mesh, glow, edges } = this.createTargetMesh(config);
     const group = new Group();
     group.add(mesh);
@@ -133,6 +136,17 @@ export class TargetSystem {
     group.position.copy(pylonPos);
     group.position.y += 0.3; // start low for pop-up anim
 
+    // Pick movement pattern (bombs and chain are always static for fairness)
+    let movement: MovementConfig;
+    if (config.type === TargetType.Bomb || config.type === TargetType.Chain) {
+      movement = { pattern: MovementPattern.Static, speed: 0, amplitude: 0, phase: 0 };
+    } else {
+      movement = pickMovementPattern(wave, diffMult);
+    }
+
+    const basePosition = pylonPos.clone();
+    basePosition.y += 0.7; // final pop-up height
+
     const target: ActiveTarget = {
       group, mesh, glowMesh: glow, edgeLines: edges,
       pylonIndex, config,
@@ -140,6 +154,8 @@ export class TargetSystem {
       lifetime: config.lifetime,
       age: 0, alive: true, spawnAnim: 0,
       chainIndex,
+      movement,
+      basePosition,
     };
 
     this.targets.push(target);
@@ -169,7 +185,7 @@ export class TargetSystem {
             const type = this.pickTargetType(difficulty, mode);
             const config = { ...TARGET_CONFIGS[type] };
             config.lifetime *= diffCfg.targetLifetimeMult;
-            const target = this.spawnTarget(idx, pylonPositions[idx], config);
+            const target = this.spawnTarget(idx, pylonPositions[idx], config, undefined, wave, DIFFICULTY_CONFIGS[difficulty].speedMult);
             scene.add(target.group);
             this.waveTargetsSpawned++;
           }
@@ -190,6 +206,9 @@ export class TargetSystem {
         target.group.scale.setScalar(s);
         const pylonPos = pylonPositions[target.pylonIndex];
         target.group.position.y = pylonPos.y + 0.3 + s * 0.4;
+      } else if (target.movement.pattern !== MovementPattern.Static) {
+        // Apply movement pattern after spawn animation completes
+        applyMovement(target.basePosition, target.movement, target.age, target.group.position);
       }
 
       // Rotation

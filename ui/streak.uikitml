@@ -1,0 +1,15 @@
+<panel>
+  <container
+    direction="row"
+    backgroundColor="#0a0a1acc"
+    borderRadius="8"
+    padding="6"
+    paddingLeft="10"
+    paddingRight="10"
+    gap="6"
+  >
+    <text id="streak-icon" fontSize="14" color="#ffdd00">🔥</text>
+    <text id="streak-count" fontSize="16" fontWeight="bold" color="#ffdd00">0</text>
+    <text id="streak-label" fontSize="10" color="#888888">STREAK</text>
+  </container>
+</panel>
