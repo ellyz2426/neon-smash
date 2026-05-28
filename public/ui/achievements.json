@@ -255,6 +255,126 @@
         "dataUid": "uid-22"
       },
       {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "[ ] ---"
+        ],
+        "properties": {
+          "id": "ach-20",
+          "class": "ach-entry"
+        },
+        "dataUid": "uid-23"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "[ ] ---"
+        ],
+        "properties": {
+          "id": "ach-21",
+          "class": "ach-entry"
+        },
+        "dataUid": "uid-24"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "[ ] ---"
+        ],
+        "properties": {
+          "id": "ach-22",
+          "class": "ach-entry"
+        },
+        "dataUid": "uid-25"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "[ ] ---"
+        ],
+        "properties": {
+          "id": "ach-23",
+          "class": "ach-entry"
+        },
+        "dataUid": "uid-26"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "[ ] ---"
+        ],
+        "properties": {
+          "id": "ach-24",
+          "class": "ach-entry"
+        },
+        "dataUid": "uid-27"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "[ ] ---"
+        ],
+        "properties": {
+          "id": "ach-25",
+          "class": "ach-entry"
+        },
+        "dataUid": "uid-28"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "[ ] ---"
+        ],
+        "properties": {
+          "id": "ach-26",
+          "class": "ach-entry"
+        },
+        "dataUid": "uid-29"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "[ ] ---"
+        ],
+        "properties": {
+          "id": "ach-27",
+          "class": "ach-entry"
+        },
+        "dataUid": "uid-30"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "[ ] ---"
+        ],
+        "properties": {
+          "id": "ach-28",
+          "class": "ach-entry"
+        },
+        "dataUid": "uid-31"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "[ ] ---"
+        ],
+        "properties": {
+          "id": "ach-29",
+          "class": "ach-entry"
+        },
+        "dataUid": "uid-32"
+      },
+      {
         "type": "container",
         "sourceTag": "div",
         "children": [
@@ -267,14 +387,14 @@
             "properties": {
               "class": "back-text"
             },
-            "dataUid": "uid-24"
+            "dataUid": "uid-34"
           }
         ],
         "properties": {
           "id": "btn-back-achievements",
           "class": "back-btn"
         },
-        "dataUid": "uid-23"
+        "dataUid": "uid-33"
       }
     ],
     "properties": {
@@ -307,14 +427,14 @@
     },
     "ach-entry": {
       "content": {
-        "fontSize": "1.1",
+        "fontSize": "1",
         "color": "#aaaaaa",
-        "marginTop": "0.3"
+        "marginTop": "0.2"
       }
     },
     "back-btn": {
       "content": {
-        "marginTop": "1.5",
+        "marginTop": "1",
         "paddingTop": "0.5",
         "paddingBottom": "0.5",
         "paddingLeft": "2",
@@ -390,7 +510,7 @@
         "column": 0
       },
       "end": {
-        "line": 61,
+        "line": 71,
         "column": 6
       }
     },
@@ -611,16 +731,116 @@
       },
       "end": {
         "line": 60,
-        "column": 92
+        "column": 52
       }
     },
     "uid-24": {
       "start": {
-        "line": 60,
+        "line": 61,
+        "column": 2
+      },
+      "end": {
+        "line": 61,
+        "column": 52
+      }
+    },
+    "uid-25": {
+      "start": {
+        "line": 62,
+        "column": 2
+      },
+      "end": {
+        "line": 62,
+        "column": 52
+      }
+    },
+    "uid-26": {
+      "start": {
+        "line": 63,
+        "column": 2
+      },
+      "end": {
+        "line": 63,
+        "column": 52
+      }
+    },
+    "uid-27": {
+      "start": {
+        "line": 64,
+        "column": 2
+      },
+      "end": {
+        "line": 64,
+        "column": 52
+      }
+    },
+    "uid-28": {
+      "start": {
+        "line": 65,
+        "column": 2
+      },
+      "end": {
+        "line": 65,
+        "column": 52
+      }
+    },
+    "uid-29": {
+      "start": {
+        "line": 66,
+        "column": 2
+      },
+      "end": {
+        "line": 66,
+        "column": 52
+      }
+    },
+    "uid-30": {
+      "start": {
+        "line": 67,
+        "column": 2
+      },
+      "end": {
+        "line": 67,
+        "column": 52
+      }
+    },
+    "uid-31": {
+      "start": {
+        "line": 68,
+        "column": 2
+      },
+      "end": {
+        "line": 68,
+        "column": 52
+      }
+    },
+    "uid-32": {
+      "start": {
+        "line": 69,
+        "column": 2
+      },
+      "end": {
+        "line": 69,
+        "column": 52
+      }
+    },
+    "uid-33": {
+      "start": {
+        "line": 70,
+        "column": 2
+      },
+      "end": {
+        "line": 70,
+        "column": 92
+      }
+    },
+    "uid-34": {
+      "start": {
+        "line": 70,
         "column": 51
       },
       "end": {
-        "line": 60,
+        "line": 70,
         "column": 86
       }
     }

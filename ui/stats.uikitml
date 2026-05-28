@@ -1,0 +1,121 @@
+<style>
+  .stats-panel {
+    display: flex;
+    flex-direction: column;
+    padding: 2;
+    background-color: rgba(0, 6, 20, 0.95);
+    border-color: #00ffff;
+    border-width: 0.1;
+    border-radius: 1;
+  }
+  .stats-title {
+    font-size: 3;
+    font-weight: bold;
+    color: #00ffff;
+    margin-bottom: 1.5;
+    text-align: center;
+  }
+  .stats-section {
+    font-size: 1.8;
+    font-weight: bold;
+    color: #ff8800;
+    margin-top: 1;
+    margin-bottom: 0.5;
+  }
+  .stat-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-vertical: 0.2;
+  }
+  .stat-label {
+    font-size: 1.4;
+    color: #8899aa;
+  }
+  .stat-value {
+    font-size: 1.4;
+    color: #ffffff;
+    font-weight: bold;
+  }
+  .btn-back {
+    margin-top: 1.5;
+    padding: 1;
+    background-color: rgba(0, 255, 255, 0.15);
+    border-color: #00ffff;
+    border-width: 0.05;
+    border-radius: 0.5;
+    cursor: pointer;
+  }
+  .btn-back-text {
+    font-size: 1.6;
+    color: #00ffff;
+    text-align: center;
+  }
+</style>
+<div class="stats-panel">
+  <span class="stats-title">STATISTICS</span>
+
+  <span class="stats-section">CAREER</span>
+  <div class="stat-row">
+    <span class="stat-label">Games Played</span>
+    <span id="stat-games" class="stat-value">0</span>
+  </div>
+  <div class="stat-row">
+    <span class="stat-label">Play Time</span>
+    <span id="stat-time" class="stat-value">0m</span>
+  </div>
+  <div class="stat-row">
+    <span class="stat-label">Targets Smashed</span>
+    <span id="stat-smashed" class="stat-value">0</span>
+  </div>
+  <div class="stat-row">
+    <span class="stat-label">All-Time Score</span>
+    <span id="stat-total-score" class="stat-value">0</span>
+  </div>
+  <div class="stat-row">
+    <span class="stat-label">Best Score</span>
+    <span id="stat-best-score" class="stat-value">0</span>
+  </div>
+  <div class="stat-row">
+    <span class="stat-label">Best Combo</span>
+    <span id="stat-best-combo" class="stat-value">0x</span>
+  </div>
+  <div class="stat-row">
+    <span class="stat-label">Best Accuracy</span>
+    <span id="stat-best-accuracy" class="stat-value">0%</span>
+  </div>
+  <div class="stat-row">
+    <span class="stat-label">Golden Hits</span>
+    <span id="stat-golden" class="stat-value">0</span>
+  </div>
+  <div class="stat-row">
+    <span class="stat-label">Perfect Waves</span>
+    <span id="stat-perfect" class="stat-value">0</span>
+  </div>
+
+  <span class="stats-section">PER MODE</span>
+  <div class="stat-row">
+    <span id="stat-mode-0" class="stat-label">---</span>
+    <span id="stat-mode-val-0" class="stat-value">---</span>
+  </div>
+  <div class="stat-row">
+    <span id="stat-mode-1" class="stat-label">---</span>
+    <span id="stat-mode-val-1" class="stat-value">---</span>
+  </div>
+  <div class="stat-row">
+    <span id="stat-mode-2" class="stat-label">---</span>
+    <span id="stat-mode-val-2" class="stat-value">---</span>
+  </div>
+  <div class="stat-row">
+    <span id="stat-mode-3" class="stat-label">---</span>
+    <span id="stat-mode-val-3" class="stat-value">---</span>
+  </div>
+  <div class="stat-row">
+    <span id="stat-mode-4" class="stat-label">---</span>
+    <span id="stat-mode-val-4" class="stat-value">---</span>
+  </div>
+
+  <div id="btn-back-stats" class="btn-back">
+    <span class="btn-back-text">BACK</span>
+  </div>
+</div>

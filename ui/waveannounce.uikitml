@@ -1,0 +1,23 @@
+<style>
+  .wave-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3;
+  }
+  .wave-text {
+    font-size: 6;
+    font-weight: bold;
+    color: #00ffff;
+  }
+  .wave-sub {
+    font-size: 2;
+    color: #88ccff;
+    margin-top: 0.5;
+  }
+</style>
+<div class="wave-panel">
+  <span id="wave-text" class="wave-text">WAVE 1</span>
+  <span id="wave-sub" class="wave-sub">GET READY!</span>
+</div>

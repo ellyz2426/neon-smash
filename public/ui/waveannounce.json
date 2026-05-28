@@ -1,0 +1,123 @@
+{
+  "element": {
+    "type": "container",
+    "sourceTag": "div",
+    "children": [
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "WAVE 1"
+        ],
+        "properties": {
+          "id": "wave-text",
+          "class": "wave-text"
+        },
+        "dataUid": "uid-2"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "GET READY!"
+        ],
+        "properties": {
+          "id": "wave-sub",
+          "class": "wave-sub"
+        },
+        "dataUid": "uid-3"
+      }
+    ],
+    "properties": {
+      "class": "wave-panel"
+    },
+    "dataUid": "uid-1"
+  },
+  "classes": {
+    "wave-panel": {
+      "content": {
+        "display": "flex",
+        "flexDirection": "column",
+        "alignItems": "center",
+        "justifyContent": "center",
+        "padding": "3"
+      }
+    },
+    "wave-text": {
+      "content": {
+        "fontSize": "6",
+        "fontWeight": "bold",
+        "color": "#00ffff"
+      }
+    },
+    "wave-sub": {
+      "content": {
+        "fontSize": "2",
+        "color": "#88ccff",
+        "marginTop": "0.5"
+      }
+    }
+  },
+  "ranges": {
+    "wave-panel": {
+      "start": {
+        "line": 1,
+        "column": 2
+      },
+      "end": {
+        "line": 1,
+        "column": 13
+      }
+    },
+    "wave-text": {
+      "start": {
+        "line": 8,
+        "column": 2
+      },
+      "end": {
+        "line": 8,
+        "column": 12
+      }
+    },
+    "wave-sub": {
+      "start": {
+        "line": 13,
+        "column": 2
+      },
+      "end": {
+        "line": 13,
+        "column": 11
+      }
+    },
+    "uid-1": {
+      "start": {
+        "line": 19,
+        "column": 0
+      },
+      "end": {
+        "line": 22,
+        "column": 6
+      }
+    },
+    "uid-2": {
+      "start": {
+        "line": 20,
+        "column": 2
+      },
+      "end": {
+        "line": 20,
+        "column": 54
+      }
+    },
+    "uid-3": {
+      "start": {
+        "line": 21,
+        "column": 2
+      },
+      "end": {
+        "line": 21,
+        "column": 56
+      }
+    }
+  }
+}

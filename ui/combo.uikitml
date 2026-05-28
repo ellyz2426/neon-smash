@@ -1,0 +1,22 @@
+<style>
+  .combo-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1;
+  }
+  .combo-text {
+    font-size: 4;
+    font-weight: bold;
+    color: #00ffff;
+  }
+  .combo-mult {
+    font-size: 2;
+    color: #ffff00;
+    font-weight: bold;
+  }
+</style>
+<div class="combo-panel">
+  <span id="combo-count" class="combo-text"></span>
+  <span id="combo-mult" class="combo-mult"></span>
+</div>

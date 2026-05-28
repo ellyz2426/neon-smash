@@ -18,12 +18,12 @@
     font-weight: bold;
   }
   .ach-entry {
-    font-size: 1.1;
+    font-size: 1;
     color: #aaaaaa;
-    margin-top: 0.3;
+    margin-top: 0.2;
   }
   .back-btn {
-    margin-top: 1.5;
+    margin-top: 1;
     padding-top: 0.5;
     padding-bottom: 0.5;
     padding-left: 2;
@@ -58,5 +58,15 @@
   <span id="ach-17" class="ach-entry">[ ] ---</span>
   <span id="ach-18" class="ach-entry">[ ] ---</span>
   <span id="ach-19" class="ach-entry">[ ] ---</span>
+  <span id="ach-20" class="ach-entry">[ ] ---</span>
+  <span id="ach-21" class="ach-entry">[ ] ---</span>
+  <span id="ach-22" class="ach-entry">[ ] ---</span>
+  <span id="ach-23" class="ach-entry">[ ] ---</span>
+  <span id="ach-24" class="ach-entry">[ ] ---</span>
+  <span id="ach-25" class="ach-entry">[ ] ---</span>
+  <span id="ach-26" class="ach-entry">[ ] ---</span>
+  <span id="ach-27" class="ach-entry">[ ] ---</span>
+  <span id="ach-28" class="ach-entry">[ ] ---</span>
+  <span id="ach-29" class="ach-entry">[ ] ---</span>
   <div id="btn-back-achievements" class="back-btn"><span class="back-text">BACK</span></div>
 </div>

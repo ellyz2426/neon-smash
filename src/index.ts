@@ -1,8 +1,8 @@
-// Neon Smash VR — Main Entry Point
+// Neon Smash VR — Main Entry Point (Round 2)
 import {
   World, PanelUI, Follower, FollowBehavior, ScreenSpace,
   PanelDocument, Vector3, Raycaster, Vector2,
-  InputComponent,
+  InputComponent, Group,
 } from '@iwsdk/core';
 import type { UIKitDocument } from '@iwsdk/core';
 import {
@@ -17,6 +17,9 @@ import { AudioManager } from './audio';
 import { Arena } from './arena';
 import { TargetSystem, ActiveTarget } from './targets';
 import { ParticleSystem } from './particles';
+import { DualStrikers, StrikerSkin, STRIKER_SKINS } from './striker';
+import { ShatterSystem, ComboFlash, ScreenShake } from './effects';
+import { recordSession, loadStats, formatPlayTime } from './stats';
 
 // === Globals ===
 let world: World;
@@ -26,7 +29,12 @@ let audio = new AudioManager();
 let arena: Arena;
 let targetSystem: TargetSystem;
 let particles: ParticleSystem;
+let shatterFx: ShatterSystem;
+let comboFlash: ComboFlash;
+let screenShake: ScreenShake;
+let strikers: DualStrikers;
 let settings = loadSettings();
+let currentSkin: StrikerSkin = StrikerSkin.Neon;
 
 // UI entities
 const uiEntities: Record<string, any> = {};
@@ -38,6 +46,8 @@ let countdownValue = 3;
 let countdownTimer = 0;
 let waveTransition = false;
 let waveTransitionTimer = 0;
+let waveAnnounceTimer = 0;
+let waveAnnounceActive = false;
 
 // Raycaster for browser aiming
 const raycaster = new Raycaster();
@@ -45,6 +55,10 @@ const pointer = new Vector2();
 
 // Pylon world positions cache
 let pylonPositions: Vector3[] = [];
+
+// Dual-wield tracking
+let leftHandUsed = false;
+let rightHandUsed = false;
 
 // === Entry Point ===
 async function main() {
@@ -82,6 +96,20 @@ async function main() {
   particles = new ParticleSystem();
   world.scene.add(particles.group);
 
+  // Shatter effects
+  shatterFx = new ShatterSystem();
+  world.scene.add(shatterFx.group);
+
+  // Combo flash
+  comboFlash = new ComboFlash();
+
+  // Screen shake
+  screenShake = new ScreenShake();
+
+  // Strikers (for XR controllers)
+  strikers = new DualStrikers(currentSkin);
+  setupStrikers();
+
   // Setup UI
   setupUI();
 
@@ -99,6 +127,22 @@ async function main() {
     requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
+}
+
+// === Striker Setup ===
+function setupStrikers(): void {
+  try {
+    const rightGrip = (world as any).playerSpaceEntities?.gripSpaces?.right;
+    const leftGrip = (world as any).playerSpaceEntities?.gripSpaces?.left;
+    if (rightGrip) {
+      rightGrip.object3D.add(strikers.right.group);
+    }
+    if (leftGrip) {
+      leftGrip.object3D.add(strikers.left.group);
+    }
+  } catch {
+    // No XR grip spaces — browser mode
+  }
 }
 
 // === UI Setup ===
@@ -119,6 +163,10 @@ function setupUI() {
     { id: 'help', config: '/ui/help.json', maxW: 0.8, maxH: 0.8, mode: 'world' },
     { id: 'toast', config: '/ui/toast.json', maxW: 0.3, maxH: 0.08, mode: 'follower' },
     { id: 'countdown', config: '/ui/countdown.json', maxW: 0.3, maxH: 0.15, mode: 'follower' },
+    { id: 'waveannounce', config: '/ui/waveannounce.json', maxW: 0.5, maxH: 0.25, mode: 'follower' },
+    { id: 'combo', config: '/ui/combo.json', maxW: 0.25, maxH: 0.12, mode: 'follower' },
+    { id: 'stats', config: '/ui/stats.json', maxW: 0.8, maxH: 0.9, mode: 'world' },
+    { id: 'skins', config: '/ui/skins.json', maxW: 0.7, maxH: 0.8, mode: 'world' },
   ];
 
   panels.forEach(p => {
@@ -128,8 +176,14 @@ function setupUI() {
     if (p.mode === 'world') {
       entity.object3D!.position.set(0, 1.5, -2);
     } else if (p.mode === 'follower') {
-      const offY = p.id === 'hud' ? 0.12 : (p.id === 'countdown' ? 0 : -0.12);
-      const offX = p.id === 'hud' ? 0.22 : 0;
+      let offY = 0, offX = 0;
+      switch (p.id) {
+        case 'hud': offY = 0.12; offX = 0.22; break;
+        case 'countdown': offY = 0; break;
+        case 'waveannounce': offY = 0.05; break;
+        case 'combo': offY = -0.08; offX = -0.2; break;
+        case 'toast': offY = -0.12; break;
+      }
       entity.addComponent(Follower, {
         target: world.player.head,
         offsetPosition: [offX, offY, -0.5],
@@ -143,9 +197,17 @@ function setupUI() {
     uiEntities[p.id] = entity;
   });
 
+  // Attach combo flash to head follower
+  try {
+    const headEntity = world.playerHeadEntity;
+    if (headEntity && headEntity.object3D) headEntity.object3D.add(comboFlash.group);
+  } catch {
+    // Not available
+  }
+
   // Bind events once docs are available
   setTimeout(() => bindUIEvents(), 500);
-  setTimeout(() => bindUIEvents(), 1500); // retry
+  setTimeout(() => bindUIEvents(), 1500);
   showUI('title');
 }
 
@@ -171,9 +233,8 @@ let eventsBound = false;
 function bindUIEvents() {
   if (eventsBound) return;
 
-  // Title
   const titleDoc = getDoc('title');
-  if (!titleDoc) return; // not ready yet
+  if (!titleDoc) return;
   eventsBound = true;
 
   bindBtn(titleDoc, 'btn-play', () => { audio.playButtonClick(); changeState('modeselect'); });
@@ -181,6 +242,8 @@ function bindUIEvents() {
   bindBtn(titleDoc, 'btn-achievements', () => { audio.playButtonClick(); populateAchievements(); changeState('achievements'); });
   bindBtn(titleDoc, 'btn-settings', () => { audio.playButtonClick(); populateSettings(); changeState('settings'); });
   bindBtn(titleDoc, 'btn-help', () => { audio.playButtonClick(); changeState('help'); });
+  bindBtn(titleDoc, 'btn-stats', () => { audio.playButtonClick(); changeState('stats'); });
+  bindBtn(titleDoc, 'btn-skins', () => { audio.playButtonClick(); changeState('skins'); });
 
   // Mode select
   const modeDoc = getDoc('modeselect');
@@ -217,7 +280,7 @@ function bindUIEvents() {
   }
 
   // Back buttons
-  ['leaderboard', 'achievements', 'settings', 'help'].forEach(id => {
+  ['leaderboard', 'achievements', 'settings', 'help', 'stats', 'skins'].forEach(id => {
     const doc = getDoc(id);
     if (doc) bindBtn(doc, `btn-back-${id}`, () => { audio.playButtonClick(); changeState('title'); });
   });
@@ -233,6 +296,20 @@ function bindUIEvents() {
     bindBtn(setDoc, 'btn-music-down', () => { settings.musicVolume = Math.max(0, settings.musicVolume - 0.1); audio.setMusicVolume(settings.musicVolume); saveSettings(settings); populateSettings(); });
     bindBtn(setDoc, 'btn-theme-prev', () => { settings.theme = (settings.theme - 1 + ARENA_THEMES.length) % ARENA_THEMES.length; arena.setTheme(settings.theme, world.scene); saveSettings(settings); populateSettings(); });
     bindBtn(setDoc, 'btn-theme-next', () => { settings.theme = (settings.theme + 1) % ARENA_THEMES.length; arena.setTheme(settings.theme, world.scene); saveSettings(settings); populateSettings(); });
+  }
+
+  // Skins
+  const skinsDoc = getDoc('skins');
+  if (skinsDoc) {
+    const skinKeys = Object.keys(STRIKER_SKINS) as StrikerSkin[];
+    skinKeys.forEach((skin, i) => {
+      bindBtn(skinsDoc, `skin-${i}`, () => {
+        audio.playButtonClick();
+        currentSkin = skin;
+        strikers.setSkin(skin);
+        populateSkins();
+      });
+    });
   }
 }
 
@@ -284,6 +361,14 @@ function changeState(newState: GameState) {
     case 'help':
       showUI('help');
       break;
+    case 'stats':
+      showUI('stats');
+      populateStats();
+      break;
+    case 'skins':
+      showUI('skins');
+      populateSkins();
+      break;
   }
 }
 
@@ -293,10 +378,15 @@ function startGame(diff: Difficulty) {
   targetSystem.clearAll(world.scene);
   targetSystem.removeBoss(world.scene);
   particles.clear();
+  shatterFx.clear();
   gameTime = 0;
   waveTransition = false;
+  waveAnnounceActive = false;
+  leftHandUsed = false;
+  rightHandUsed = false;
   audio.startMusic();
   targetSystem.startWave(gsm.wave, gsm.mode);
+  showWaveAnnouncement(gsm.wave);
   changeState('countdown');
 }
 
@@ -305,6 +395,24 @@ function endGame() {
   targetSystem.clearAll(world.scene);
   targetSystem.removeBoss(world.scene);
   particles.clear();
+  shatterFx.clear();
+
+  // Record session stats
+  recordSession({
+    mode: gsm.mode,
+    difficulty: gsm.difficulty,
+    score: gsm.score,
+    hits: gsm.hits,
+    misses: gsm.misses,
+    maxCombo: gsm.maxCombo,
+    accuracy: gsm.getAccuracy(),
+    timeElapsed: gsm.timeElapsed,
+    waveReached: gsm.wave,
+    goldenHits: gsm.goldenHits,
+    bombsHit: gsm.bombsHit,
+    chainCompletes: gsm.chainCompletes,
+    perfectWaves: gsm.perfectWaves,
+  });
 
   // Save leaderboard
   addToLeaderboard({
@@ -316,9 +424,7 @@ function endGame() {
     date: new Date().toLocaleDateString(),
   });
 
-  // Check achievements
   checkAchievements();
-
   changeState('title');
 }
 
@@ -326,9 +432,32 @@ function endGame() {
 function update(dt: number, t: number) {
   arena.update(t);
   particles.update(dt);
+  shatterFx.update(dt);
+  comboFlash.update(dt);
+  screenShake.update(dt);
+
+  // Update strikers
+  strikers.update(dt);
 
   // Handle XR input
   handleXRInput();
+
+  // Wave announcement timer
+  if (waveAnnounceActive) {
+    waveAnnounceTimer += dt;
+    if (waveAnnounceTimer >= 2) {
+      waveAnnounceActive = false;
+      if (uiEntities['waveannounce']) uiEntities['waveannounce'].object3D!.visible = false;
+    }
+  }
+
+  // Combo display
+  if (state === 'playing' && gsm.combo >= 3) {
+    updateComboDisplay();
+    if (uiEntities['combo']) uiEntities['combo'].object3D!.visible = true;
+  } else {
+    if (uiEntities['combo']) uiEntities['combo'].object3D!.visible = false;
+  }
 
   switch (state) {
     case 'countdown':
@@ -377,38 +506,40 @@ function updatePlaying(dt: number, t: number) {
   const spawnEnabled = !waveTransition && !(gsm.mode === GameMode.BossWave && targetSystem.bossGroup);
   targetSystem.update(dt, gsm.difficulty, gsm.mode, gsm.wave, pylonPositions, world.scene, spawnEnabled);
 
-  // Check for expired targets (misses)
-  // Already handled in target system
-
   // Wave completion check
   if (!waveTransition && targetSystem.isWaveComplete() && !(gsm.mode === GameMode.BossWave && targetSystem.bossGroup)) {
     if (gsm.mode === GameMode.SpeedRush) {
-      // Continuous in speed rush
       targetSystem.startWave(gsm.wave, gsm.mode);
     } else if (gsm.mode === GameMode.Precision) {
       gameOver(true);
       return;
     } else {
-      // Wave complete
-      if (gsm.waveHits === gsm.waveTargets && gsm.waveTargets > 0 && gsm.waveBombsHit === 0) {
+      // Record wave stats
+      gsm.recordWaveComplete();
+      const wasPerfect = gsm.waveHits === gsm.waveTargets && gsm.waveTargets > 0 && gsm.waveBombsHit === 0;
+
+      if (wasPerfect) {
         tryAchievement('perfect_wave');
+        audio.playPerfectWave();
+        showToast('PERFECT WAVE!');
+        if (gsm.perfectWaves >= 3) tryAchievement('perfect_3');
       }
+
+      if (gsm.noMissWaveStreak >= 5) tryAchievement('no_miss_wave5');
 
       if (gsm.wave >= gsm.totalWaves && gsm.mode === GameMode.Classic) {
         gameOver(true);
         return;
       }
 
-      // Boss wave: spawn boss after clearing minions
       if (gsm.mode === GameMode.BossWave && !targetSystem.bossGroup) {
         targetSystem.spawnBoss(world.scene, gsm.wave);
         showToast('BOSS INCOMING!');
       } else {
-        // Next wave
         waveTransition = true;
         waveTransitionTimer = 0;
         audio.playWaveComplete();
-        showToast(`WAVE ${gsm.wave} CLEAR!`);
+        if (!wasPerfect) showToast(`WAVE ${gsm.wave} CLEAR!`);
       }
     }
   }
@@ -418,11 +549,10 @@ function updatePlaying(dt: number, t: number) {
     waveTransitionTimer += dt;
     if (waveTransitionTimer >= 2) {
       waveTransition = false;
-      gsm.wave++;
-      gsm.waveTargets = 0;
-      gsm.waveHits = 0;
-      gsm.waveBombsHit = 0;
+      gsm.startNextWave();
       targetSystem.startWave(gsm.wave, gsm.mode);
+      showWaveAnnouncement(gsm.wave);
+      audio.playWaveStart(gsm.wave);
     }
   }
 
@@ -439,6 +569,23 @@ function gameOver(completed: boolean) {
     audio.playGameOver();
   }
 
+  // Record session stats
+  recordSession({
+    mode: gsm.mode,
+    difficulty: gsm.difficulty,
+    score: gsm.score,
+    hits: gsm.hits,
+    misses: gsm.misses,
+    maxCombo: gsm.maxCombo,
+    accuracy: gsm.getAccuracy(),
+    timeElapsed: gsm.timeElapsed,
+    waveReached: gsm.wave,
+    goldenHits: gsm.goldenHits,
+    bombsHit: gsm.bombsHit,
+    chainCompletes: gsm.chainCompletes,
+    perfectWaves: gsm.perfectWaves,
+  });
+
   addToLeaderboard({
     score: gsm.score,
     mode: MODE_NAMES[gsm.mode],
@@ -452,6 +599,29 @@ function gameOver(completed: boolean) {
   changeState('gameover');
 }
 
+// === Wave Announcement ===
+function showWaveAnnouncement(wave: number) {
+  waveAnnounceActive = true;
+  waveAnnounceTimer = 0;
+  const entity = uiEntities['waveannounce'];
+  if (entity) entity.object3D!.visible = true;
+  const doc = getDoc('waveannounce');
+  if (doc) {
+    setText(doc, 'wave-text', `WAVE ${wave}`);
+    const subs = ['GET READY!', 'HERE THEY COME!', 'INCOMING!', 'BRACE YOURSELF!', 'KEEP SMASHING!'];
+    setText(doc, 'wave-sub', subs[wave % subs.length]);
+  }
+}
+
+// === Combo Display ===
+function updateComboDisplay() {
+  const doc = getDoc('combo');
+  if (!doc) return;
+  setText(doc, 'combo-count', `${gsm.combo}`);
+  const mult = gsm.getComboMultiplier();
+  setText(doc, 'combo-mult', mult > 1 ? `x${mult}` : '');
+}
+
 // === Hit Detection (Browser) ===
 function setupBrowserInput(container: HTMLDivElement) {
   container.addEventListener('mousemove', (e) => {
@@ -463,7 +633,7 @@ function setupBrowserInput(container: HTMLDivElement) {
   container.addEventListener('click', () => {
     if (state !== 'playing') return;
     audio.init();
-    performStrike();
+    performStrike('browser');
   });
 
   document.addEventListener('keydown', (e) => {
@@ -474,26 +644,20 @@ function setupBrowserInput(container: HTMLDivElement) {
   });
 }
 
-function performStrike() {
+function performStrike(hand: 'left' | 'right' | 'browser' = 'browser') {
   if (state !== 'playing') return;
 
+  // Track hand usage for dual-wield achievement
+  if (hand === 'left') leftHandUsed = true;
+  if (hand === 'right') rightHandUsed = true;
+  if (hand === 'left') gsm.leftHandHits++;
+  if (hand === 'right') gsm.rightHandHits++;
+
   // Raycast from camera
-  const camera = (world as any).renderer?.xr?.isPresenting
-    ? null // handled by XR input
-    : (world.scene as any).children?.find?.((c: any) => c.isCamera) || null;
-
-  if (!camera) {
-    // Fallback: use world camera
-    raycaster.setFromCamera(pointer, (world as any)._camera || (world as any).camera);
-  } else {
-    raycaster.setFromCamera(pointer, camera);
-  }
-
-  // Try to get the actual camera
   try {
     const cam = (world as any)._camera || (world as any).camera || (world.scene.children.find((c: any) => c.isCamera));
     if (cam) raycaster.setFromCamera(pointer, cam);
-  } catch { /* use fallback */ }
+  } catch { /* fallback */ }
 
   // Check targets
   let hitSomething = false;
@@ -520,14 +684,18 @@ function performStrike() {
         audio.playBossHit();
         const scored = gsm.addHit(250);
         showToast(`+${scored}`);
-        particles.burst(zone.mesh.getWorldPosition(new Vector3()), 0x00ffff, 15, 4, 0.6);
+        const zonePos = zone.mesh.getWorldPosition(new Vector3());
+        particles.burst(zonePos, 0x00ffff, 15, 4, 0.6);
+        shatterFx.shatter(zonePos, 0x00ffff, 6, 0.8);
+        screenShake.trigger(0.02);
         if (defeated) {
           audio.playBossDefeat();
           showToast('BOSS DEFEATED!');
           gsm.score += 2000;
           tryAchievement('boss_first');
           particles.ring(new Vector3(0, 1.8, -4), 0xff00ff, 20, 1.5);
-          // Continue to next wave
+          shatterFx.shatter(new Vector3(0, 1.8, -4), 0xff00ff, 15, 1.5);
+          screenShake.trigger(0.04);
           waveTransition = true;
           waveTransitionTimer = 0;
         }
@@ -545,6 +713,11 @@ function performStrike() {
     gsm.addMiss();
     audio.playMiss();
   }
+
+  // Check dual-wield achievement
+  if (leftHandUsed && rightHandUsed) {
+    tryAchievement('dual_wield');
+  }
 }
 
 function hitTarget(target: ActiveTarget) {
@@ -552,19 +725,22 @@ function hitTarget(target: ActiveTarget) {
   const pos = target.group.position.clone();
 
   if (config.type === 'bomb') {
-    // Hit a bomb — bad!
-    gsm.score += config.points; // negative
+    gsm.score += config.points;
     gsm.combo = 0;
     gsm.bombsHit++;
     gsm.waveBombsHit++;
     audio.playBombHit();
     particles.burst(pos, 0xff0000, 20, 5, 0.8);
+    shatterFx.shatter(pos, 0xff0000, 12, 1.2);
+    screenShake.trigger(0.04);
     showToast(`BOMB! ${config.points}`);
     if (gsm.mode !== GameMode.SpeedRush && gsm.mode !== GameMode.Precision) {
       if (gsm.loseLife()) {
+        audio.playLifeLost();
         gameOver(false);
         return;
       }
+      audio.playLifeLost();
     }
     targetSystem.removeTarget(target, world.scene);
     return;
@@ -573,14 +749,13 @@ function hitTarget(target: ActiveTarget) {
   const destroyed = targetSystem.hitTarget(target, world.scene);
 
   if (!destroyed) {
-    // Armored: partial hit
     audio.playArmoredHit();
     particles.burst(pos, config.color, 6, 2, 0.3);
+    shatterFx.shatter(pos, config.color, 4, 0.5);
     showToast('CRACK!');
     return;
   }
 
-  // Target destroyed
   gsm.totalTargets++;
   gsm.waveTargets++;
   const scored = gsm.addHit(config.points);
@@ -592,20 +767,28 @@ function hitTarget(target: ActiveTarget) {
       audio.playGoldenHit();
       particles.burst(pos, 0xffd700, 18, 4, 0.7);
       particles.ring(pos, 0xffd700, 12);
+      shatterFx.shatter(pos, 0xffd700, 8, 1.0);
       break;
     case 'chain':
+      gsm.chainCompletes++;
       audio.playChainComplete();
       particles.burst(pos, 0x00ff88, 15, 3, 0.5);
+      shatterFx.shatter(pos, 0x00ff88, 6, 0.7);
       tryAchievement('chain_complete');
       break;
     default:
       audio.playHit(config.points / 100);
       particles.burst(pos, config.color, 12, 3, 0.5);
+      shatterFx.shatter(pos, config.color, 6, 0.6);
       break;
   }
 
+  screenShake.trigger(0.01);
+
   // Combo feedback
   if (gsm.combo >= 5) {
+    comboFlash.trigger(gsm.combo);
+    audio.playStreakSound(gsm.combo);
     showToast(`${gsm.combo}x COMBO! +${scored}`);
   } else {
     showToast(`+${scored}`);
@@ -616,32 +799,46 @@ function hitTarget(target: ActiveTarget) {
   if (gsm.combo >= 5) tryAchievement('combo_5');
   if (gsm.combo >= 10) tryAchievement('combo_10');
   if (gsm.combo >= 25) tryAchievement('combo_25');
+  if (gsm.combo >= 50) tryAchievement('combo_50');
   if (gsm.goldenHits >= 5) tryAchievement('golden_5');
   if (gsm.goldenHits >= 20) tryAchievement('golden_20');
 }
 
-// === XR Input ===
+// === XR Input (Dual-Wield) ===
 function handleXRInput() {
   try {
-    const rightGamepad = (world.input as any).xr?.gamepads?.right;
-    if (!rightGamepad) return;
+    const xrInput = (world.input as any).xr;
+    if (!xrInput) return;
 
-    const triggerDown = rightGamepad.getButtonDown?.(InputComponent.Trigger);
-    const bDown = rightGamepad.getButtonDown?.(InputComponent.B_Button);
-    const aDown = rightGamepad.getButtonDown?.(InputComponent.A_Button);
+    // Right controller
+    const rightGamepad = xrInput.gamepads?.right;
+    if (rightGamepad) {
+      const triggerDown = rightGamepad.getButtonDown?.(InputComponent.Trigger);
+      const bDown = rightGamepad.getButtonDown?.(InputComponent.B_Button);
 
-    if (state === 'playing' && triggerDown) {
-      performStrike();
+      if (state === 'playing' && triggerDown) {
+        performStrike('right');
+      }
+      if (state === 'playing' && bDown) {
+        changeState('paused');
+      }
+      if (state === 'paused' && bDown) {
+        changeState('playing');
+      }
     }
-    if (state === 'playing' && bDown) {
-      changeState('paused');
-    }
-    if (state === 'paused' && bDown) {
-      changeState('playing');
-    }
-    if (aDown) {
-      // Confirm / select in menus
-      audio.playButtonClick();
+
+    // Left controller (dual-wielding!)
+    const leftGamepad = xrInput.gamepads?.left;
+    if (leftGamepad) {
+      const triggerDown = leftGamepad.getButtonDown?.(InputComponent.Trigger);
+      const xDown = leftGamepad.getButtonDown?.(InputComponent.A_Button); // X on left
+
+      if (state === 'playing' && triggerDown) {
+        performStrike('left');
+      }
+      if (xDown) {
+        audio.playButtonClick();
+      }
     }
   } catch { /* XR not available */ }
 }
@@ -728,6 +925,49 @@ function populateSettings() {
   setText(doc, 'val-theme', ARENA_THEMES[settings.theme].name);
 }
 
+function populateStats() {
+  const doc = getDoc('stats');
+  if (!doc) return;
+  const stats = loadStats();
+  setText(doc, 'stat-games', `${stats.totalGamesPlayed}`);
+  setText(doc, 'stat-time', formatPlayTime(stats.totalPlayTime));
+  setText(doc, 'stat-smashed', `${stats.totalTargetsSmashed}`);
+  setText(doc, 'stat-total-score', `${stats.allTimeScore}`);
+  setText(doc, 'stat-best-score', `${stats.allTimeBestScore}`);
+  setText(doc, 'stat-best-combo', `${stats.allTimeBestCombo}x`);
+  setText(doc, 'stat-best-accuracy', `${stats.allTimeBestAccuracy}%`);
+  setText(doc, 'stat-golden', `${stats.totalGoldenHits}`);
+  setText(doc, 'stat-perfect', `${stats.totalPerfectWaves}`);
+
+  const modeKeys = Object.keys(stats.modeStats);
+  const modeNames: Record<string, string> = {
+    classic: 'CLASSIC', speedrush: 'SPEED RUSH', precision: 'PRECISION',
+    endless: 'ENDLESS', bosswave: 'BOSS WAVE',
+  };
+  for (let i = 0; i < 5; i++) {
+    const key = modeKeys[i];
+    if (key && stats.modeStats[key]) {
+      const ms = stats.modeStats[key];
+      setText(doc, `stat-mode-${i}`, modeNames[key] || key);
+      setText(doc, `stat-mode-val-${i}`, `${ms.gamesPlayed}g, Best: ${ms.bestScore}`);
+    } else {
+      setText(doc, `stat-mode-${i}`, '---');
+      setText(doc, `stat-mode-val-${i}`, '---');
+    }
+  }
+}
+
+function populateSkins() {
+  const doc = getDoc('skins');
+  if (!doc) return;
+  const skinKeys = Object.keys(STRIKER_SKINS) as StrikerSkin[];
+  skinKeys.forEach((skin, i) => {
+    const cfg = STRIKER_SKINS[skin];
+    setText(doc, `skin-name-${i}`, cfg.name);
+    setText(doc, `skin-ind-${i}`, skin === currentSkin ? '[EQUIPPED]' : '');
+  });
+}
+
 // === Achievements ===
 function tryAchievement(id: string) {
   const unlocked = loadAchievements();
@@ -745,10 +985,19 @@ function checkAchievements() {
   if (gsm.score >= 100000) tryAchievement('score_100k');
   if (gsm.mode === GameMode.Classic && gsm.bombsHit === 0 && gsm.lives > 0) tryAchievement('no_bombs');
   if (gsm.mode === GameMode.SpeedRush && gsm.hits >= 50) tryAchievement('speed_50');
+  if (gsm.mode === GameMode.SpeedRush && gsm.hits >= 100) tryAchievement('speed_100');
   if (gsm.mode === GameMode.Precision && gsm.getAccuracy() >= 90) tryAchievement('precision_90');
   if (gsm.mode === GameMode.Precision && gsm.getAccuracy() === 100) tryAchievement('precision_100');
   if (gsm.mode === GameMode.Endless && gsm.timeElapsed >= 300) tryAchievement('endless_5m');
+  if (gsm.mode === GameMode.Endless && gsm.timeElapsed >= 600) tryAchievement('endless_10m');
+  if (gsm.mode === GameMode.Endless && gsm.wave >= 10) tryAchievement('wave_10');
   if (gsm.modesPlayed.size >= 5) tryAchievement('all_modes');
+
+  // Total smash count from stats
+  const stats = loadStats();
+  if (stats.totalTargetsSmashed >= 1000) tryAchievement('total_1000');
+  if (stats.totalGamesPlayed >= 10) tryAchievement('games_10');
+  if (stats.totalGamesPlayed >= 50) tryAchievement('games_50');
 }
 
 // === Start ===

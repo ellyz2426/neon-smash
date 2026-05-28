@@ -2,7 +2,7 @@
 import { Vector3 } from '@iwsdk/core';
 
 // === Game States ===
-export type GameState = 'title' | 'modeselect' | 'difficulty' | 'countdown' | 'playing' | 'paused' | 'gameover' | 'leaderboard' | 'achievements' | 'settings' | 'help';
+export type GameState = 'title' | 'modeselect' | 'difficulty' | 'countdown' | 'playing' | 'paused' | 'gameover' | 'leaderboard' | 'achievements' | 'settings' | 'help' | 'stats' | 'skins';
 
 // === Target Types ===
 export enum TargetType {
@@ -96,6 +96,9 @@ export const ARENA_THEMES: ArenaTheme[] = [
   { name: 'Toxic Zone', gridColor: 0x44ff00, accentColor: 0x88ff44, pylonColor: 0x114400, fogColor: 0x040a00, ambientColor: 0x113311 },
   { name: 'Ultraviolet', gridColor: 0xaa44ff, accentColor: 0xcc66ff, pylonColor: 0x220044, fogColor: 0x060014, ambientColor: 0x221144 },
   { name: 'Solar Blaze', gridColor: 0xff8800, accentColor: 0xffaa44, pylonColor: 0x442200, fogColor: 0x0a0400, ambientColor: 0x332211 },
+  { name: 'Frost Cavern', gridColor: 0x44aaff, accentColor: 0x88ddff, pylonColor: 0x112244, fogColor: 0x020814, ambientColor: 0x112233 },
+  { name: 'Void Rift', gridColor: 0xff00ff, accentColor: 0xff44ff, pylonColor: 0x330033, fogColor: 0x08000a, ambientColor: 0x221133 },
+  { name: 'Emerald Grid', gridColor: 0x00ff88, accentColor: 0x44ffaa, pylonColor: 0x004422, fogColor: 0x000a06, ambientColor: 0x113322 },
 ];
 
 // === Pylon Positions ===
@@ -134,6 +137,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'combo_5', name: 'Combo Starter', description: 'Reach a 5x combo', unlocked: false },
   { id: 'combo_10', name: 'Combo Master', description: 'Reach a 10x combo', unlocked: false },
   { id: 'combo_25', name: 'Combo Legend', description: 'Reach a 25x combo', unlocked: false },
+  { id: 'combo_50', name: 'Unstoppable', description: 'Reach a 50x combo', unlocked: false },
   { id: 'score_1k', name: 'Breaking In', description: 'Score 1,000 points', unlocked: false },
   { id: 'score_10k', name: 'Going Strong', description: 'Score 10,000 points', unlocked: false },
   { id: 'score_50k', name: 'Smash King', description: 'Score 50,000 points', unlocked: false },
@@ -146,10 +150,19 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'precision_90', name: 'Sharpshooter', description: 'Achieve 90%+ accuracy in Precision', unlocked: false },
   { id: 'precision_100', name: 'Perfect Aim', description: '100% accuracy in Precision', unlocked: false },
   { id: 'endless_5m', name: 'Endurance', description: 'Survive 5 minutes in Endless', unlocked: false },
+  { id: 'endless_10m', name: 'Marathon', description: 'Survive 10 minutes in Endless', unlocked: false },
   { id: 'boss_first', name: 'Boss Slayer', description: 'Defeat your first boss', unlocked: false },
   { id: 'boss_flawless', name: 'Flawless Victory', description: 'Defeat a boss without missing', unlocked: false },
   { id: 'chain_complete', name: 'Chain Reaction', description: 'Complete a chain sequence', unlocked: false },
   { id: 'all_modes', name: 'Versatile', description: 'Play all 5 game modes', unlocked: false },
+  { id: 'dual_wield', name: 'Dual Wielder', description: 'Hit targets with both controllers', unlocked: false },
+  { id: 'speed_100', name: 'Lightning Hands', description: 'Hit 100 targets in Speed Rush', unlocked: false },
+  { id: 'games_10', name: 'Regular', description: 'Play 10 games', unlocked: false },
+  { id: 'games_50', name: 'Dedicated', description: 'Play 50 games', unlocked: false },
+  { id: 'perfect_3', name: 'Hat Trick', description: 'Get 3 perfect waves in one game', unlocked: false },
+  { id: 'wave_10', name: 'Survivor', description: 'Reach wave 10 in Endless', unlocked: false },
+  { id: 'no_miss_wave5', name: 'Sharpshooter Elite', description: 'Complete 5 waves without a miss', unlocked: false },
+  { id: 'total_1000', name: 'Thousand Smashes', description: 'Smash 1,000 total targets', unlocked: false },
 ];
 
 // === Game State Manager ===
@@ -183,6 +196,15 @@ export class GameStateManager {
   waveHits = 0;
   waveBombsHit = 0;
 
+  // Extended tracking
+  chainCompletes = 0;
+  perfectWaves = 0;
+  leftHandHits = 0;
+  rightHandHits = 0;
+  waveMisses = 0; // misses in current wave
+  consecutivePerfectWaves = 0;
+  noMissWaveStreak = 0; // consecutive waves with 0 misses
+
   reset(mode: GameMode, diff: Difficulty): void {
     this.score = 0;
     this.combo = 0;
@@ -202,6 +224,13 @@ export class GameStateManager {
     this.bossHP = 0;
     this.bossMaxHP = 0;
     this.bossActive = false;
+    this.chainCompletes = 0;
+    this.perfectWaves = 0;
+    this.leftHandHits = 0;
+    this.rightHandHits = 0;
+    this.waveMisses = 0;
+    this.consecutivePerfectWaves = 0;
+    this.noMissWaveStreak = 0;
     this.mode = mode;
     this.difficulty = diff;
     this.modesPlayed.add(mode);
@@ -262,6 +291,29 @@ export class GameStateManager {
   addMiss(): void {
     this.combo = 0;
     this.misses++;
+    this.waveMisses++;
+  }
+
+  recordWaveComplete(): void {
+    if (this.waveHits === this.waveTargets && this.waveTargets > 0 && this.waveBombsHit === 0) {
+      this.perfectWaves++;
+      this.consecutivePerfectWaves++;
+    } else {
+      this.consecutivePerfectWaves = 0;
+    }
+    if (this.waveMisses === 0 && this.waveTargets > 0) {
+      this.noMissWaveStreak++;
+    } else {
+      this.noMissWaveStreak = 0;
+    }
+  }
+
+  startNextWave(): void {
+    this.wave++;
+    this.waveTargets = 0;
+    this.waveHits = 0;
+    this.waveBombsHit = 0;
+    this.waveMisses = 0;
   }
 
   loseLife(): boolean {

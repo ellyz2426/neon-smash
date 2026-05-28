@@ -39,12 +39,17 @@
     color: #00ffff;
     font-weight: bold;
   }
-  .btn-small {
+  .btn-row {
+    display: flex;
+    flex-direction: row;
     margin-top: 1;
+    gap: 1;
+  }
+  .btn-small {
     padding-top: 0.6;
     padding-bottom: 0.6;
-    padding-left: 2;
-    padding-right: 2;
+    padding-left: 1.5;
+    padding-right: 1.5;
     background-color: rgba(0, 255, 255, 0.08);
     border-color: #00aaaa;
     border-width: 0.06;
@@ -52,7 +57,7 @@
     cursor: pointer;
   }
   .btn-small-text {
-    font-size: 1.5;
+    font-size: 1.3;
     color: #00aaaa;
   }
 </style>
@@ -60,8 +65,14 @@
   <span class="game-title">NEON SMASH</span>
   <span class="subtitle">HOLODECK TARGET ARENA</span>
   <div id="btn-play" class="btn"><span class="btn-text">PLAY</span></div>
-  <div id="btn-leaderboard" class="btn-small"><span class="btn-small-text">LEADERBOARD</span></div>
-  <div id="btn-achievements" class="btn-small"><span class="btn-small-text">ACHIEVEMENTS</span></div>
-  <div id="btn-settings" class="btn-small"><span class="btn-small-text">SETTINGS</span></div>
-  <div id="btn-help" class="btn-small"><span class="btn-small-text">HELP</span></div>
+  <div class="btn-row">
+    <div id="btn-leaderboard" class="btn-small"><span class="btn-small-text">LEADERBOARD</span></div>
+    <div id="btn-achievements" class="btn-small"><span class="btn-small-text">ACHIEVEMENTS</span></div>
+  </div>
+  <div class="btn-row">
+    <div id="btn-settings" class="btn-small"><span class="btn-small-text">SETTINGS</span></div>
+    <div id="btn-help" class="btn-small"><span class="btn-small-text">HELP</span></div>
+    <div id="btn-stats" class="btn-small"><span class="btn-small-text">STATS</span></div>
+    <div id="btn-skins" class="btn-small"><span class="btn-small-text">SKINS</span></div>
+  </div>
 </div>

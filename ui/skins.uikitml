@@ -1,0 +1,93 @@
+<style>
+  .skins-panel {
+    display: flex;
+    flex-direction: column;
+    padding: 2;
+    background-color: rgba(0, 6, 20, 0.95);
+    border-color: #00ffff;
+    border-width: 0.1;
+    border-radius: 1;
+  }
+  .skins-title {
+    font-size: 3;
+    font-weight: bold;
+    color: #00ffff;
+    margin-bottom: 1.5;
+    text-align: center;
+  }
+  .skin-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8;
+    margin-bottom: 0.5;
+    background-color: rgba(0, 255, 255, 0.05);
+    border-radius: 0.5;
+    cursor: pointer;
+  }
+  .skin-selected {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8;
+    margin-bottom: 0.5;
+    background-color: rgba(0, 255, 255, 0.2);
+    border-color: #00ffff;
+    border-width: 0.05;
+    border-radius: 0.5;
+    cursor: pointer;
+  }
+  .skin-name {
+    font-size: 1.8;
+    color: #ffffff;
+    font-weight: bold;
+  }
+  .skin-indicator {
+    font-size: 1.4;
+    color: #00ffff;
+  }
+  .btn-back {
+    margin-top: 1.5;
+    padding: 1;
+    background-color: rgba(0, 255, 255, 0.15);
+    border-color: #00ffff;
+    border-width: 0.05;
+    border-radius: 0.5;
+    cursor: pointer;
+  }
+  .btn-back-text {
+    font-size: 1.6;
+    color: #00ffff;
+    text-align: center;
+  }
+</style>
+<div class="skins-panel">
+  <span class="skins-title">STRIKER SKINS</span>
+
+  <div id="skin-0" class="skin-selected">
+    <span id="skin-name-0" class="skin-name">Neon</span>
+    <span id="skin-ind-0" class="skin-indicator">[EQUIPPED]</span>
+  </div>
+  <div id="skin-1" class="skin-row">
+    <span id="skin-name-1" class="skin-name">Flame</span>
+    <span id="skin-ind-1" class="skin-indicator"></span>
+  </div>
+  <div id="skin-2" class="skin-row">
+    <span id="skin-name-2" class="skin-name">Ice</span>
+    <span id="skin-ind-2" class="skin-indicator"></span>
+  </div>
+  <div id="skin-3" class="skin-row">
+    <span id="skin-name-3" class="skin-name">Void</span>
+    <span id="skin-ind-3" class="skin-indicator"></span>
+  </div>
+  <div id="skin-4" class="skin-row">
+    <span id="skin-name-4" class="skin-name">Lightning</span>
+    <span id="skin-ind-4" class="skin-indicator"></span>
+  </div>
+
+  <div id="btn-back-skins" class="btn-back">
+    <span class="btn-back-text">BACK</span>
+  </div>
+</div>
