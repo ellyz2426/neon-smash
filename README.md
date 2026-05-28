@@ -1,192 +1,92 @@
-# 🏀 Neon Hoops
+# 🎯 Neon Smash VR
 
-**A neon-drenched basketball game built with IWSDK (Immersive Web SDK) — playable in browser and VR.**
+A holodeck-style VR target-smashing arcade game built with [IWSDK](https://iwsdk.dev) 0.4.1.
 
-[![Play Now](https://img.shields.io/badge/Play%20Now-GitHub%20Pages-00ccff?style=for-the-badge)](https://ellyz2426.github.io/neon-hoops/)
+**[▶ Play Now](https://ellyz2426.github.io/neon-smash/)** | [GitHub](https://github.com/ellyz2426/neon-smash)
 
-Neon Hoops drops you into a holodeck-style basketball court with glowing neon lines, floating wireframe decorations, and a synthwave soundtrack. Shoot hoops from the free throw line, chase high scores in Arcade mode, battle an AI opponent in H.O.R.S.E., or master all 10 trick shots. Works in any modern browser with mouse/keyboard — and in VR with Meta Quest controllers.
+## Overview
 
----
+Neon Smash drops you into a glowing neon arena where targets pop up from pylons in a semicircular array. Strike them with dual-wielding mallets in VR or click to aim in browser mode. Build combos, dodge bombs, collect power-ups, and chase high scores across five game modes.
 
-## 🎮 Game Modes
+## Features
 
+### Core Gameplay
+- **6 target types**: Normal (cyan), Speed (yellow), Armored (orange, 2-hit), Bomb (red, avoid!), Golden (gold, rare bonus), Chain (green, sequence)
+- **5 movement patterns**: Targets can zigzag, orbit, dive toward you, wobble erratically, or strafe — difficulty scales per wave
+- **Combo scoring**: x1→x2→x3→x5→x10 multipliers at consecutive hit thresholds
+- **Boss targets**: Giant icosahedron with orbiting weak points in Boss Wave mode
+
+### Game Modes
 | Mode | Description |
 |------|-------------|
-| **Free Throw** | Classic 10-shot challenge from the free throw line. Aim for a perfect 10/10. |
-| **Three-Point Contest** | 5 racks of 5 balls around the three-point arc, 60-second timer. Chase the high score. |
-| **Arcade** | Progressive difficulty — start with 30 seconds, earn +3s (or +5s on swish) per make. Rim shrinks as levels increase. Moving shot positions push further from the hoop. Level milestones at 5, 10, 15, 20, 25, 30. |
-| **H.O.R.S.E.** | Classic letter-matching duel against an AI opponent. First to spell H-O-R-S-E loses. Difficulty setting controls wind strength. |
-| **Trick Shots** | 10 unique challenges requiring specific shot types — swishes from half court, bank shots off the glass, corner threes, and more. |
-| **Daily Challenge** | Same 10-shot sequence for everyone each day (seeded RNG). Compare your best score. |
-| **Practice** | Unlimited shots, no timer, no pressure. Just shoot. |
+| **Classic** | 10 waves, 3 lives — survive the onslaught |
+| **Speed Rush** | 60 seconds — how many can you smash? |
+| **Precision** | 30 targets — accuracy is everything |
+| **Endless** | Infinite waves — how long can you last? |
+| **Boss Wave** | Giant boss targets with orbiting weak points |
 
----
+### VR & Browser
+- **Dual-wielding**: Both XR controllers fire independently with trigger
+- **VR haptic feedback**: Intensity-scaled vibrations for hits, bombs, golden targets, armored cracks
+- **Browser mode**: Mouse aim + click to strike, ESC to pause
+- **Dual-runtime**: XR offer-once with full browser fallback (WASD not needed — stationary game)
 
-## 🕹️ Controls
+### Power-Ups
+- ⏱ **Time Slow** — 40% game speed for 8 seconds
+- ✕2 **Double Points** — 2x scoring for 10 seconds
+- 🧲 **Magnet Pull** — pulls targets toward you for 6 seconds
+- 🛡 **Shield** — blocks one bomb hit for 12 seconds
 
-### Browser (Mouse + Keyboard)
+### Progression
+- **30 achievements** with localStorage persistence
+- **Top 20 leaderboard** with score, mode, accuracy, max combo
+- **Career statistics**: total games, play time, targets smashed, per-mode bests
+- **Match history**: last 50 games with timestamps, relative dates, and detailed breakdowns
+- **5 striker skins**: Neon, Flame, Ice, Void, Lightning — each with unique trail colors
+- **Daily Challenges**: Seeded PRNG with 10 challenge modifiers (Bomb Storm, Glass Cannon, No Miss, etc.)
 
-| Action | Control |
-|--------|---------|
-| Shoot | Click and drag up to charge power, release to shoot |
-| Aim | Move mouse left/right while charging |
-| Pause | `Escape` |
-| Restart (Game Over) | `R` |
-| Return to Menu (Game Over) | `M` |
-| Quick Mode Select (Title/Mode Screen) | `1`–`7` |
+### Arena
+- **8 arena themes**: Holodeck, Crimson Arena, Toxic Zone, Ultraviolet, Solar Blaze, Frost Cavern, Void Rift, Emerald Grid
+- **Combo-responsive lighting**: Arena lights, floor grid, pylon glows, and ambient particles react to combo level
+- **15 pylons** in a 3×5 semicircular arrangement with decorative wireframe shapes
 
-### VR (Meta Quest Controllers)
+### Audio
+- **Procedural Web Audio**: 15+ SFX, hit pitch variations (ascending on consecutive hits, resets on miss)
+- **Layered music**: Sub bass + LFO + triangle pad + bass fifth + A-minor arpeggiator
+- **Ambient**: Low-pass noise floor, 60Hz electrical hum with LFO, tonal drone
+- **Stingers**: Victory fanfare (ascending + harmony pad + cymbal), defeat (descending + dark bass + reverse cymbal)
+- **Per-event SFX**: Power-up collect/expire, challenge complete, wave start, streak, life lost, perfect wave
 
-| Action | Control |
-|--------|---------|
-| Shoot | Hold right trigger to charge, release to shoot |
-| Pause | `B` button (right controller) |
-| Navigate Menus | Controller laser pointer + trigger click |
+### UI
+- **21 PanelUI spatial panels** — all `.uikitml` templates, zero HTML DOM
+- **Follower HUDs**: Score/lives, combo counter, power-up timers, streak indicator, wave announcements, toasts
+- **World panels**: Title, mode select, difficulty, pause, game over, leaderboard, achievements, settings, stats, skins, challenge, tutorial, match history, help
+- **6-step interactive tutorial**
 
----
+## Tech Stack
 
-## 🎨 Court Themes
+- **IWSDK 0.4.1** — WebXR framework (Three.js/ECS)
+- **PanelUI** — Spatial UI system (`.uikitml` → compiled JSON → 3D panels)
+- **Vite** — Build tooling with `@iwsdk/vite-plugin-uikitml`
+- **TypeScript** — Full type safety
+- **Web Audio API** — All audio is procedurally generated
 
-Switch between 5 neon court themes from the Settings menu:
-
-| Theme | Palette |
-|-------|---------|
-| **Neon Arena** | Orange neon, dark blue court |
-| **Cyberpunk** | Magenta/purple, deep violet court |
-| **Arctic Court** | Cyan/ice blue, navy court |
-| **Solar Blaze** | Gold/amber, warm dark court |
-| **Toxic Green** | Bright green, dark emerald court |
-
----
-
-## 🏆 Achievements (20 Total)
-
-| Achievement | Requirement |
-|-------------|-------------|
-| First Basket | Make your first shot |
-| Sharpshooter | Make 5 in a row |
-| Perfect 10 | Go 10/10 in Free Throw |
-| Downtown | Hit a three-pointer |
-| Swish Master | 5 swishes in one game |
-| Bank Artist | 3 bank shots in one game |
-| On Fire | 10-shot streak |
-| Century Club | Score 100+ in one game |
-| Marksman | 80%+ accuracy (10+ shots) |
-| Long Range | Make a half-court shot |
-| Trick Master | Complete all 10 trick shots |
-| Horse Tamer | Win a game of H.O.R.S.E. |
-| Arcade Star | Score 50+ in Arcade |
-| Arcade Legend | Score 100+ in Arcade |
-| Downtown Sniper | 20+ in Three-Point Contest |
-| Untouchable | Win H.O.R.S.E. with no misses |
-| Regular | Play 10 games |
-| Veteran | Play 50 games |
-| Centurion | Make 100 total shots |
-| Hall of Famer | Make 500 total shots |
-
----
-
-## 🎯 Trick Shots (10 Challenges)
-
-1. **Nothing But Net** — Swish from the free throw line
-2. **Bank It** — Bank shot off the backboard
-3. **Corner Three** — Make it from the corner
-4. **Downtown** — Hit from half court
-5. **Side Swish** — Swish from the wing
-6. **Off the Glass** — Bank shot from distance
-7. **Baseline Bomb** — Score from the baseline
-8. **Pure Splash** — Swish from the three-point arc
-9. **Glass Cleaner** — Bank from the elbow
-10. **Impossible** — Swish from half court
-
----
-
-## 🏀 Ball Skins
-
-8 customizable ball appearances (Settings → Ball Select):
-
-Classic Orange · Neon Blue · Plasma Green · Hot Pink · Gold Rush · Void Purple · Ice White · Lava Core
-
----
-
-## ✨ Features
-
-- **Arc-trajectory physics** — 4-substep integration with gravity, rim/backboard/floor collisions, ball spin
-- **Procedural synthwave music** — Am-F-C-G chord progression, sawtooth bass, square wave arpeggios, hi-hat pattern, 110 BPM
-- **17+ procedural SFX** — throw whoosh, swish, rim hit, backboard hit, floor bounce, net swoosh, charge hum, countdown ticks, fanfares, achievement jingle, dribble, crowd cheer, and more
-- **Wind system** — dynamic N/S/E/W wind tied to difficulty selection
-- **Instant replay** — ghost trail of your last successful shot
-- **Ball trail** — glowing trail with additive blending follows the ball in flight
-- **Shot arc preview** — dotted trajectory arc shows projected path while charging
-- **Net physics animation** — net rings sway on makes with decay
-- **Ball shadow** — dynamic court shadow scales with altitude
-- **Rim glow indicator** — color-coded proximity feedback during flight
-- **Confetti system** — colorful confetti burst on achievement unlocks
-- **Score popup effects** — floating accent particles on makes
-- **Idle dribble animation** — ball bounces after 3 seconds of inactivity
-- **Holodeck environment** — neon grid floor/ceiling, 12 floating wireframe shapes, 40 ambient particles, fog
-- **Career stats** — tracks total games, career makes, best streak, high scores per mode
-- **Leaderboard** — top 20 scores with mode, accuracy, and date
-- **Tutorial** — first-time player guide with controls and tips
-- **All UI in PanelUI** — 17 `.uikitml` spatial panels, zero HTML DOM overlays — works in both browser and VR
-
----
-
-## 🛠️ Technical Notes
-
-- Built with **[IWSDK](https://iwsdk.dev) 0.4.1** (Immersive Web SDK)
-- **Dual-runtime architecture** — `xr: { offer: 'once' }` + `canvasPointerEvents` enables both VR and browser play
-- **All game UI uses IWSDK's PanelUI** (`.uikitml` compiled by `@iwsdk/vite-plugin-uikitml`) — no HTML DOM overlays, ensuring full XR compatibility
-- **7 source modules**: `index.ts` (main loop + game logic), `types.ts` (interfaces + config), `audio.ts` (procedural Web Audio), `physics.ts` (arc trajectory + collisions), `particles.ts` (particle effects), `court.ts` (geometry + environment), `effects.ts` (shadow, glow, replay, confetti, wind, dribble)
-- **17 PanelUI templates** in `ui/` directory — title, mode select, difficulty, HUD, power bar, toast, countdown, pause, game over, leaderboard, achievements, settings, ball select, help, daily challenge, career stats, tutorial
-- **Procedural audio** — all sound generated at runtime via Web Audio API oscillators, noise buffers, and filters — no audio files loaded
-- **localStorage persistence** — achievements, leaderboard, settings, career stats, daily challenge history
-
----
-
-## 🚀 Development
-
-### Prerequisites
-
-- Node.js ≥ 20.19.0
-
-### Setup
+## Development
 
 ```bash
-git clone https://github.com/ellyz2426/neon-hoops.git
-cd neon-hoops
 npm install
+npx iwsdk dev up     # launches dev server with headless browser
+npm run build        # production build to dist/
 ```
 
-### Dev Server
+## Stats
 
-```bash
-npm run dev
-```
-
-Opens at `https://localhost:8081` with hot reload and headless Playwright Chromium for XR emulation.
-
-### Build
-
-```bash
-npm run build
-```
-
-Outputs static files to `dist/`.
-
-### Deploy to GitHub Pages
-
-```bash
-npm run build
-PROJECT="$PWD"
-cd /tmp && rm -rf gh-pages-deploy && mkdir gh-pages-deploy && cd gh-pages-deploy
-git init && cp -R "$PROJECT/dist/." .
-git add -A && git commit -m "Deploy"
-git push --force "https://github.com/ellyz2426/neon-hoops.git" HEAD:gh-pages
-```
+- **34 source files** (13 TypeScript + 21 uikitml templates)
+- **5,766 lines** of source code
+- **21 compiled PanelUI panels**
+- **Zero HTML DOM overlays**
+- **4 build rounds**, 135 total minutes
 
 ---
 
-## 📄 License
-
-MIT
+Built with [IWSDK](https://iwsdk.dev) by the daily build pipeline.
