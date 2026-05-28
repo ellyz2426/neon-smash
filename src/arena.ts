@@ -1,4 +1,4 @@
-// Neon Smash VR — Arena environment
+// Neon Smash VR — Arena environment (Round 3: combo-responsive lighting)
 import {
   Mesh, Group, BoxGeometry, SphereGeometry, CylinderGeometry,
   PlaneGeometry, TorusGeometry, ConeGeometry,
@@ -17,6 +17,14 @@ export class Arena {
   ambientParticles: Mesh[] = [];
   private theme: ArenaTheme;
 
+  // Combo-responsive lighting
+  private comboLights: PointLight[] = [];
+  private ambientLight: AmbientLight | null = null;
+  private floorMat: MeshStandardMaterial | null = null;
+  private gridLines: Mesh[] = [];
+  private currentComboIntensity = 0;
+  private targetComboIntensity = 0;
+
   constructor(themeIdx = 0) {
     this.theme = ARENA_THEMES[themeIdx] || ARENA_THEMES[0];
   }
@@ -34,11 +42,11 @@ export class Arena {
 
   private buildFloor(): void {
     const geo = new PlaneGeometry(30, 30);
-    const mat = new MeshStandardMaterial({
+    this.floorMat = new MeshStandardMaterial({
       color: 0x000000, emissive: this.theme.gridColor, emissiveIntensity: 0.05,
       transparent: true, opacity: 0.8,
     });
-    const floor = new Mesh(geo, mat);
+    const floor = new Mesh(geo, this.floorMat);
     floor.rotation.x = -Math.PI / 2;
     floor.position.y = 0;
     this.group.add(floor);
@@ -52,11 +60,13 @@ export class Arena {
       const line = new Mesh(lineGeo, lineMat);
       line.position.set(i, 0.001, 0);
       this.group.add(line);
+      this.gridLines.push(line);
 
       const line2 = new Mesh(lineGeo.clone(), lineMat.clone());
       line2.rotation.y = Math.PI / 2;
       line2.position.set(0, 0.001, i);
       this.group.add(line2);
+      this.gridLines.push(line2);
     }
   }
 
@@ -77,7 +87,6 @@ export class Arena {
     positions.forEach((pos) => {
       const pylon = new Group();
 
-      // Base cylinder
       const baseMat = new MeshStandardMaterial({
         color: this.theme.pylonColor, emissive: this.theme.accentColor, emissiveIntensity: 0.2,
         metalness: 0.8, roughness: 0.3,
@@ -86,7 +95,6 @@ export class Arena {
       base.position.y = 0.25;
       pylon.add(base);
 
-      // Top ring
       const ringMat = new MeshStandardMaterial({
         color: this.theme.accentColor, emissive: this.theme.accentColor, emissiveIntensity: 0.6,
         transparent: true, opacity: 0.8,
@@ -96,7 +104,6 @@ export class Arena {
       ring.position.y = 0.52;
       pylon.add(ring);
 
-      // Glow indicator (pulsing when active)
       const glowMat = new MeshBasicMaterial({
         color: this.theme.accentColor, transparent: true, opacity: 0.3,
       });
@@ -155,8 +162,8 @@ export class Arena {
   }
 
   private buildLighting(): void {
-    const ambient = new AmbientLight(this.theme.ambientColor, 0.4);
-    this.group.add(ambient as any);
+    this.ambientLight = new AmbientLight(this.theme.ambientColor, 0.4);
+    this.group.add(this.ambientLight as any);
 
     // Accent lights around arena
     const colors = [this.theme.accentColor, this.theme.gridColor, 0xffffff];
@@ -165,20 +172,102 @@ export class Arena {
       const angle = (i / colors.length) * Math.PI * 2;
       light.position.set(Math.sin(angle) * 5, 3, Math.cos(angle) * 5);
       this.group.add(light as any);
+      this.comboLights.push(light);
     });
 
     // Overhead spot
     const overhead = new PointLight(0xffffff, 0.8, 12);
     overhead.position.set(0, 3.8, -2);
     this.group.add(overhead as any);
+    this.comboLights.push(overhead);
+  }
+
+  // === Combo-responsive lighting ===
+  setComboLevel(combo: number): void {
+    // Map combo to intensity: 0-4 = normal, 5-9 = warm, 10-24 = hot, 25+ = blazing
+    if (combo >= 25) this.targetComboIntensity = 1.0;
+    else if (combo >= 10) this.targetComboIntensity = 0.6;
+    else if (combo >= 5) this.targetComboIntensity = 0.3;
+    else this.targetComboIntensity = 0;
+  }
+
+  private getComboColor(intensity: number): Color {
+    // Lerp from theme accent to hot white through orange
+    const baseColor = new Color(this.theme.accentColor);
+    if (intensity <= 0) return baseColor;
+    if (intensity <= 0.3) {
+      return baseColor.lerp(new Color(0xffaa44), intensity / 0.3);
+    } else if (intensity <= 0.6) {
+      return new Color(0xffaa44).lerp(new Color(0xff4444), (intensity - 0.3) / 0.3);
+    } else {
+      return new Color(0xff4444).lerp(new Color(0xffffff), (intensity - 0.6) / 0.4);
+    }
   }
 
   update(t: number): void {
+    // Smooth combo intensity transition
+    const lerpSpeed = 3;
+    const dt = 0.016; // approximate
+    this.currentComboIntensity += (this.targetComboIntensity - this.currentComboIntensity) * lerpSpeed * dt;
+
+    // Apply combo lighting
+    if (this.currentComboIntensity > 0.01) {
+      const comboColor = this.getComboColor(this.currentComboIntensity);
+      const lightBoost = 1 + this.currentComboIntensity * 2;
+
+      // Boost accent lights
+      this.comboLights.forEach((light, i) => {
+        if (i < 3) {
+          light.intensity = 1.5 * lightBoost;
+          light.color.copy(comboColor);
+        }
+      });
+
+      // Pulse floor emissive
+      if (this.floorMat) {
+        this.floorMat.emissiveIntensity = 0.05 + this.currentComboIntensity * 0.15 *
+          (1 + 0.3 * Math.sin(t * 4 * (1 + this.currentComboIntensity)));
+      }
+
+      // Boost grid line opacity
+      const gridOpacity = 0.15 + this.currentComboIntensity * 0.25;
+      for (const line of this.gridLines) {
+        (line.material as MeshBasicMaterial).opacity = gridOpacity;
+      }
+
+      // Ambient light boost
+      if (this.ambientLight) {
+        this.ambientLight.intensity = 0.4 + this.currentComboIntensity * 0.3;
+      }
+    } else {
+      // Reset to defaults
+      this.comboLights.forEach((light, i) => {
+        if (i < 3) {
+          light.intensity = 1.5;
+        }
+      });
+      if (this.floorMat) this.floorMat.emissiveIntensity = 0.05;
+      if (this.ambientLight) this.ambientLight.intensity = 0.4;
+    }
+
+    // Pylon glow pulse at high combo
+    if (this.currentComboIntensity > 0.3) {
+      const pulsePhase = t * 3;
+      this.pylonGlows.forEach((glow, i) => {
+        glow.visible = true;
+        (glow.material as MeshBasicMaterial).opacity = 0.2 + 0.3 * this.currentComboIntensity *
+          Math.sin(pulsePhase + i * 0.5) * 0.5 + 0.5;
+      });
+    } else {
+      this.pylonGlows.forEach(glow => { glow.visible = false; });
+    }
+
     // Animate decorations
     this.decorations.forEach((d) => {
       const ud = (d as any).userData;
-      d.rotation.y += ud.rotSpeed * 0.01;
-      d.rotation.x += ud.rotSpeed * 0.005;
+      const speedMult = 1 + this.currentComboIntensity * 2;
+      d.rotation.y += ud.rotSpeed * 0.01 * speedMult;
+      d.rotation.x += ud.rotSpeed * 0.005 * speedMult;
       d.position.y = ud.baseY + Math.sin(t * ud.bobSpeed + ud.phase) * ud.bobAmp;
     });
 
@@ -187,7 +276,8 @@ export class Arena {
       const ud = (p as any).userData;
       p.position.x += ud.driftX * 0.01;
       p.position.y += ud.driftY * 0.01;
-      (p.material as MeshBasicMaterial).opacity = 0.15 + 0.15 * Math.sin(t * 1.5 + ud.phase);
+      const baseOpacity = 0.15 + this.currentComboIntensity * 0.15;
+      (p.material as MeshBasicMaterial).opacity = baseOpacity + 0.15 * Math.sin(t * 1.5 + ud.phase);
       if (p.position.y > 4) p.position.y = 0.2;
       if (Math.abs(p.position.x) > 10) ud.driftX *= -1;
     });

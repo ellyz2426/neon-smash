@@ -1,0 +1,85 @@
+<!-- ui/tutorial.uikitml — Training/tutorial mode overlay -->
+<style>
+  .tutorial-panel {
+    display: flex;
+    flex-direction: column;
+    padding: 2;
+    background-color: rgba(0, 0, 0, 0.92);
+    border-color: #00ff88;
+    border-width: 0.15;
+    border-radius: 1;
+    gap: 0.6;
+    align-items: center;
+  }
+  .tutorial-header {
+    font-size: 3;
+    color: #00ff88;
+    font-weight: bold;
+  }
+  .tutorial-step {
+    font-size: 1.6;
+    color: #ffffff;
+    font-weight: bold;
+  }
+  .tutorial-text {
+    font-size: 1.3;
+    color: #cccccc;
+  }
+  .tutorial-hint {
+    font-size: 1.2;
+    color: #88ffaa;
+    font-style: italic;
+  }
+  .tutorial-progress {
+    font-size: 1.1;
+    color: #888888;
+  }
+  .btn-row {
+    display: flex;
+    flex-direction: row;
+    gap: 1;
+    margin-top: 0.5;
+  }
+  .tut-btn {
+    padding-x: 2;
+    padding-y: 0.8;
+    background-color: rgba(0, 255, 136, 0.3);
+    border-color: #00ff88;
+    border-width: 0.1;
+    border-radius: 0.5;
+    cursor: pointer;
+  }
+  .tut-btn-text {
+    font-size: 1.4;
+    color: #00ff88;
+    font-weight: bold;
+  }
+  .skip-btn {
+    padding-x: 2;
+    padding-y: 0.8;
+    background-color: rgba(128, 128, 128, 0.3);
+    border-color: #888888;
+    border-width: 0.1;
+    border-radius: 0.5;
+    cursor: pointer;
+  }
+  .skip-btn-text {
+    font-size: 1.3;
+    color: #aaaaaa;
+  }
+</style>
+<div class="tutorial-panel">
+  <span class="tutorial-header">TRAINING</span>
+  <span id="tut-step" class="tutorial-step">Step 1 / 6</span>
+  <span id="tut-title" class="tutorial-text">Welcome to Neon Smash!</span>
+  <span id="tut-desc" class="tutorial-hint">Aim at targets and strike to smash them</span>
+  <span id="tut-progress" class="tutorial-progress"></span>
+  <div class="btn-row">
+    <div id="btn-tut-next" class="tut-btn" cursor="pointer">
+      <span class="tut-btn-text">NEXT</span>
+    </div>
+    <div id="btn-tut-skip" class="skip-btn" cursor="pointer">
+      <span class="skip-btn-text">SKIP</span>
+    </div>
+  </div>
+</div>

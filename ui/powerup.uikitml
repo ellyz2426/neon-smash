@@ -1,0 +1,43 @@
+<!-- ui/powerup.uikitml — Active power-up status indicator (head-following HUD) -->
+<style>
+  .powerup-container {
+    display: flex;
+    flex-direction: row;
+    gap: 0.3;
+    padding: 0.3;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 0.5;
+    border-color: rgba(255, 255, 255, 0.2);
+    border-width: 0.05;
+    align-items: center;
+  }
+  .pu-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 3;
+  }
+  .pu-name {
+    font-size: 0.9;
+    color: #ffffff;
+    font-weight: bold;
+  }
+  .pu-timer {
+    font-size: 0.8;
+    color: #aaaaaa;
+  }
+</style>
+<div class="powerup-container">
+  <div class="pu-slot">
+    <span id="pu-name-0" class="pu-name"></span>
+    <span id="pu-timer-0" class="pu-timer"></span>
+  </div>
+  <div class="pu-slot">
+    <span id="pu-name-1" class="pu-name"></span>
+    <span id="pu-timer-1" class="pu-timer"></span>
+  </div>
+  <div class="pu-slot">
+    <span id="pu-name-2" class="pu-name"></span>
+    <span id="pu-timer-2" class="pu-timer"></span>
+  </div>
+</div>

@@ -1,4 +1,4 @@
-// Neon Smash VR — Main Entry Point (Round 2)
+// Neon Smash VR — Main Entry Point (Round 3: power-ups, challenges, tutorial, enhanced FX)
 import {
   World, PanelUI, Follower, FollowBehavior, ScreenSpace,
   PanelDocument, Vector3, Raycaster, Vector2,
@@ -20,6 +20,11 @@ import { ParticleSystem } from './particles';
 import { DualStrikers, StrikerSkin, STRIKER_SKINS } from './striker';
 import { ShatterSystem, ComboFlash, ScreenShake } from './effects';
 import { recordSession, loadStats, formatPlayTime } from './stats';
+import { PowerUpSystem, PowerUpType, POWERUP_CONFIGS } from './powerups';
+import {
+  generateDailyChallenge, isChallengeCompleted, markChallengeCompleted,
+  getChallengeStreak, getChallengeConfig, DailyChallenge, ChallengeGameConfig,
+} from './challenges';
 
 // === Globals ===
 let world: World;
@@ -33,8 +38,25 @@ let shatterFx: ShatterSystem;
 let comboFlash: ComboFlash;
 let screenShake: ScreenShake;
 let strikers: DualStrikers;
+let powerups: PowerUpSystem;
 let settings = loadSettings();
 let currentSkin: StrikerSkin = StrikerSkin.Neon;
+
+// Challenge state
+let currentChallenge: DailyChallenge | null = null;
+let challengeConfig: ChallengeGameConfig | null = null;
+let isPlayingChallenge = false;
+
+// Tutorial state
+let tutorialStep = 0;
+const TUTORIAL_STEPS = [
+  { title: 'Welcome to Neon Smash!', desc: 'A VR target-smashing arcade game. Let\'s learn the basics!', hint: 'Press NEXT to continue' },
+  { title: 'Aiming & Striking', desc: 'In VR: Pull the trigger to strike. In browser: Click to strike.', hint: 'Aim at targets with your controller or mouse' },
+  { title: 'Target Types', desc: 'Cyan=Normal, Yellow=Speed, Orange=Armored (2 hits), Red=BOMB (avoid!)', hint: 'Different targets score different points' },
+  { title: 'Combos & Multipliers', desc: 'Hit targets without missing to build combos. 5x=2X, 10x=3X, 25x=10X!', hint: 'The arena lights up as your combo grows' },
+  { title: 'Power-Ups', desc: 'Floating pickups grant abilities: Time Slow, 2X Points, Magnet, Shield', hint: 'Strike them to collect' },
+  { title: 'Ready to Play!', desc: 'Choose a mode and difficulty, then smash as many targets as you can!', hint: 'Try Classic mode to start' },
+];
 
 // UI entities
 const uiEntities: Record<string, any> = {};
@@ -59,6 +81,9 @@ let pylonPositions: Vector3[] = [];
 // Dual-wield tracking
 let leftHandUsed = false;
 let rightHandUsed = false;
+
+// Power-up expiry warning
+let lastPowerUpWarning = 0;
 
 // === Entry Point ===
 async function main() {
@@ -106,6 +131,9 @@ async function main() {
   // Screen shake
   screenShake = new ScreenShake();
 
+  // Power-ups
+  powerups = new PowerUpSystem();
+
   // Strikers (for XR controllers)
   strikers = new DualStrikers(currentSkin);
   setupStrikers();
@@ -134,15 +162,9 @@ function setupStrikers(): void {
   try {
     const rightGrip = (world as any).playerSpaceEntities?.gripSpaces?.right;
     const leftGrip = (world as any).playerSpaceEntities?.gripSpaces?.left;
-    if (rightGrip) {
-      rightGrip.object3D.add(strikers.right.group);
-    }
-    if (leftGrip) {
-      leftGrip.object3D.add(strikers.left.group);
-    }
-  } catch {
-    // No XR grip spaces — browser mode
-  }
+    if (rightGrip) rightGrip.object3D.add(strikers.right.group);
+    if (leftGrip) leftGrip.object3D.add(strikers.left.group);
+  } catch { /* No XR grip spaces — browser mode */ }
 }
 
 // === UI Setup ===
@@ -167,6 +189,10 @@ function setupUI() {
     { id: 'combo', config: '/ui/combo.json', maxW: 0.25, maxH: 0.12, mode: 'follower' },
     { id: 'stats', config: '/ui/stats.json', maxW: 0.8, maxH: 0.9, mode: 'world' },
     { id: 'skins', config: '/ui/skins.json', maxW: 0.7, maxH: 0.8, mode: 'world' },
+    // Round 3 panels
+    { id: 'powerup', config: '/ui/powerup.json', maxW: 0.35, maxH: 0.08, mode: 'follower' },
+    { id: 'challenge', config: '/ui/challenge.json', maxW: 0.85, maxH: 0.8, mode: 'world' },
+    { id: 'tutorial', config: '/ui/tutorial.json', maxW: 0.8, maxH: 0.6, mode: 'world' },
   ];
 
   panels.forEach(p => {
@@ -183,6 +209,7 @@ function setupUI() {
         case 'waveannounce': offY = 0.05; break;
         case 'combo': offY = -0.08; offX = -0.2; break;
         case 'toast': offY = -0.12; break;
+        case 'powerup': offY = 0.16; offX = -0.18; break;
       }
       entity.addComponent(Follower, {
         target: world.player.head,
@@ -201,9 +228,7 @@ function setupUI() {
   try {
     const headEntity = world.playerHeadEntity;
     if (headEntity && headEntity.object3D) headEntity.object3D.add(comboFlash.group);
-  } catch {
-    // Not available
-  }
+  } catch { /* Not available */ }
 
   // Bind events once docs are available
   setTimeout(() => bindUIEvents(), 500);
@@ -244,6 +269,9 @@ function bindUIEvents() {
   bindBtn(titleDoc, 'btn-help', () => { audio.playButtonClick(); changeState('help'); });
   bindBtn(titleDoc, 'btn-stats', () => { audio.playButtonClick(); changeState('stats'); });
   bindBtn(titleDoc, 'btn-skins', () => { audio.playButtonClick(); changeState('skins'); });
+  // Round 3 buttons
+  bindBtn(titleDoc, 'btn-challenge', () => { audio.playButtonClick(); populateChallenge(); changeState('challenge'); });
+  bindBtn(titleDoc, 'btn-tutorial', () => { audio.playButtonClick(); tutorialStep = 0; populateTutorial(); changeState('tutorial'); });
 
   // Mode select
   const modeDoc = getDoc('modeselect');
@@ -311,6 +339,28 @@ function bindUIEvents() {
       });
     });
   }
+
+  // Challenge
+  const chDoc = getDoc('challenge');
+  if (chDoc) {
+    bindBtn(chDoc, 'btn-start-challenge', () => { audio.playButtonClick(); startChallenge(); });
+    bindBtn(chDoc, 'btn-back-challenge', () => { audio.playButtonClick(); changeState('title'); });
+  }
+
+  // Tutorial
+  const tutDoc = getDoc('tutorial');
+  if (tutDoc) {
+    bindBtn(tutDoc, 'btn-tut-next', () => {
+      audio.playButtonClick();
+      tutorialStep++;
+      if (tutorialStep >= TUTORIAL_STEPS.length) {
+        changeState('title');
+      } else {
+        populateTutorial();
+      }
+    });
+    bindBtn(tutDoc, 'btn-tut-skip', () => { audio.playButtonClick(); changeState('title'); });
+  }
 }
 
 function bindBtn(doc: UIKitDocument, id: string, fn: () => void): void {
@@ -326,6 +376,8 @@ function changeState(newState: GameState) {
       showUI('title');
       targetSystem.clearAll(world.scene);
       targetSystem.removeBoss(world.scene);
+      powerups.clearAll(world.scene);
+      isPlayingChallenge = false;
       break;
     case 'modeselect':
       showUI('modeselect');
@@ -369,6 +421,12 @@ function changeState(newState: GameState) {
       showUI('skins');
       populateSkins();
       break;
+    case 'challenge':
+      showUI('challenge');
+      break;
+    case 'tutorial':
+      showUI('tutorial');
+      break;
   }
 }
 
@@ -379,11 +437,41 @@ function startGame(diff: Difficulty) {
   targetSystem.removeBoss(world.scene);
   particles.clear();
   shatterFx.clear();
+  powerups.clearAll(world.scene);
   gameTime = 0;
   waveTransition = false;
   waveAnnounceActive = false;
   leftHandUsed = false;
   rightHandUsed = false;
+  lastPowerUpWarning = 0;
+  audio.startMusic();
+  targetSystem.startWave(gsm.wave, gsm.mode);
+  showWaveAnnouncement(gsm.wave);
+  changeState('countdown');
+}
+
+function startChallenge() {
+  currentChallenge = generateDailyChallenge();
+  challengeConfig = getChallengeConfig(currentChallenge);
+  isPlayingChallenge = true;
+  gsm.mode = currentChallenge.mode;
+
+  // Apply challenge config overrides
+  gsm.reset(currentChallenge.mode, currentChallenge.difficulty);
+  if (challengeConfig.lives !== null) gsm.lives = challengeConfig.lives;
+  if (challengeConfig.timeLimit !== null) gsm.timeRemaining = challengeConfig.timeLimit;
+
+  targetSystem.clearAll(world.scene);
+  targetSystem.removeBoss(world.scene);
+  particles.clear();
+  shatterFx.clear();
+  powerups.clearAll(world.scene);
+  gameTime = 0;
+  waveTransition = false;
+  waveAnnounceActive = false;
+  leftHandUsed = false;
+  rightHandUsed = false;
+  lastPowerUpWarning = 0;
   audio.startMusic();
   targetSystem.startWave(gsm.wave, gsm.mode);
   showWaveAnnouncement(gsm.wave);
@@ -396,35 +484,26 @@ function endGame() {
   targetSystem.removeBoss(world.scene);
   particles.clear();
   shatterFx.clear();
+  powerups.clearAll(world.scene);
+  arena.setComboLevel(0);
 
-  // Record session stats
   recordSession({
-    mode: gsm.mode,
-    difficulty: gsm.difficulty,
-    score: gsm.score,
-    hits: gsm.hits,
-    misses: gsm.misses,
-    maxCombo: gsm.maxCombo,
-    accuracy: gsm.getAccuracy(),
-    timeElapsed: gsm.timeElapsed,
-    waveReached: gsm.wave,
-    goldenHits: gsm.goldenHits,
-    bombsHit: gsm.bombsHit,
-    chainCompletes: gsm.chainCompletes,
+    mode: gsm.mode, difficulty: gsm.difficulty, score: gsm.score,
+    hits: gsm.hits, misses: gsm.misses, maxCombo: gsm.maxCombo,
+    accuracy: gsm.getAccuracy(), timeElapsed: gsm.timeElapsed,
+    waveReached: gsm.wave, goldenHits: gsm.goldenHits,
+    bombsHit: gsm.bombsHit, chainCompletes: gsm.chainCompletes,
     perfectWaves: gsm.perfectWaves,
   });
 
-  // Save leaderboard
   addToLeaderboard({
-    score: gsm.score,
-    mode: MODE_NAMES[gsm.mode],
-    difficulty: gsm.difficulty,
-    accuracy: gsm.getAccuracy(),
-    maxCombo: gsm.maxCombo,
-    date: new Date().toLocaleDateString(),
+    score: gsm.score, mode: MODE_NAMES[gsm.mode],
+    difficulty: gsm.difficulty, accuracy: gsm.getAccuracy(),
+    maxCombo: gsm.maxCombo, date: new Date().toLocaleDateString(),
   });
 
   checkAchievements();
+  isPlayingChallenge = false;
   changeState('title');
 }
 
@@ -435,12 +514,13 @@ function update(dt: number, t: number) {
   shatterFx.update(dt);
   comboFlash.update(dt);
   screenShake.update(dt);
-
-  // Update strikers
   strikers.update(dt);
 
   // Handle XR input
   handleXRInput();
+
+  // Update combo-responsive arena lighting
+  arena.setComboLevel(state === 'playing' ? gsm.combo : 0);
 
   // Wave announcement timer
   if (waveAnnounceActive) {
@@ -457,6 +537,22 @@ function update(dt: number, t: number) {
     if (uiEntities['combo']) uiEntities['combo'].object3D!.visible = true;
   } else {
     if (uiEntities['combo']) uiEntities['combo'].object3D!.visible = false;
+  }
+
+  // Power-up HUD
+  if (state === 'playing' && powerups.hasActiveEffect()) {
+    updatePowerUpHUD();
+    if (uiEntities['powerup']) uiEntities['powerup'].object3D!.visible = true;
+
+    // Expiry warning
+    for (const eff of powerups.activeEffects) {
+      if (eff.remaining < 2 && eff.remaining > 1.9 && gameTime - lastPowerUpWarning > 2) {
+        audio.playPowerUpExpire();
+        lastPowerUpWarning = gameTime;
+      }
+    }
+  } else {
+    if (uiEntities['powerup']) uiEntities['powerup'].object3D!.visible = false;
   }
 
   switch (state) {
@@ -486,10 +582,14 @@ function updateCountdownState(dt: number) {
 }
 
 function updatePlaying(dt: number, t: number) {
+  // Apply time slow from power-up
+  const timeScale = powerups.getTimeScale();
+  const scaledDt = dt * timeScale;
+
   // Time tracking
   gsm.timeElapsed += dt;
   if (gsm.mode === GameMode.SpeedRush) {
-    gsm.timeRemaining -= dt;
+    gsm.timeRemaining -= dt; // real time, not slowed
     if (gsm.timeRemaining <= 0) {
       gsm.timeRemaining = 0;
       gameOver(true);
@@ -499,12 +599,30 @@ function updatePlaying(dt: number, t: number) {
 
   // Boss mode
   if (gsm.mode === GameMode.BossWave && targetSystem.bossGroup) {
-    targetSystem.updateBoss(dt, t);
+    targetSystem.updateBoss(scaledDt, t);
   }
 
-  // Update targets
+  // Update targets (with time scale)
   const spawnEnabled = !waveTransition && !(gsm.mode === GameMode.BossWave && targetSystem.bossGroup);
-  targetSystem.update(dt, gsm.difficulty, gsm.mode, gsm.wave, pylonPositions, world.scene, spawnEnabled);
+  targetSystem.update(scaledDt, gsm.difficulty, gsm.mode, gsm.wave, pylonPositions, world.scene, spawnEnabled);
+
+  // Update power-ups
+  powerups.update(scaledDt, gsm.wave, pylonPositions, world.scene, spawnEnabled && state === 'playing');
+
+  // Magnet pull: drag nearby targets toward center for easier hitting
+  if (powerups.magnetPull) {
+    for (const target of targetSystem.targets) {
+      if (!target.alive) continue;
+      const toCenter = new Vector3(0, 1.5, -2).sub(target.group.position).normalize();
+      target.group.position.add(toCenter.multiplyScalar(dt * 0.5));
+    }
+  }
+
+  // Challenge no-miss check
+  if (isPlayingChallenge && challengeConfig?.noMissAllowed && gsm.misses > 0) {
+    gameOver(false);
+    return;
+  }
 
   // Wave completion check
   if (!waveTransition && targetSystem.isWaveComplete() && !(gsm.mode === GameMode.BossWave && targetSystem.bossGroup)) {
@@ -514,7 +632,6 @@ function updatePlaying(dt: number, t: number) {
       gameOver(true);
       return;
     } else {
-      // Record wave stats
       gsm.recordWaveComplete();
       const wasPerfect = gsm.waveHits === gsm.waveTargets && gsm.waveTargets > 0 && gsm.waveBombsHit === 0;
 
@@ -563,36 +680,37 @@ function gameOver(completed: boolean) {
   audio.stopMusic();
   targetSystem.clearAll(world.scene);
   targetSystem.removeBoss(world.scene);
+  powerups.clearAll(world.scene);
+  arena.setComboLevel(0);
+
   if (completed) {
     audio.playWinFanfare();
   } else {
     audio.playGameOver();
   }
 
-  // Record session stats
+  // Check challenge completion
+  if (isPlayingChallenge && currentChallenge && completed) {
+    if (gsm.score >= currentChallenge.targetScore) {
+      markChallengeCompleted(currentChallenge.date);
+      audio.playChallengeComplete();
+      showToast('CHALLENGE COMPLETE!');
+    }
+  }
+
   recordSession({
-    mode: gsm.mode,
-    difficulty: gsm.difficulty,
-    score: gsm.score,
-    hits: gsm.hits,
-    misses: gsm.misses,
-    maxCombo: gsm.maxCombo,
-    accuracy: gsm.getAccuracy(),
-    timeElapsed: gsm.timeElapsed,
-    waveReached: gsm.wave,
-    goldenHits: gsm.goldenHits,
-    bombsHit: gsm.bombsHit,
-    chainCompletes: gsm.chainCompletes,
+    mode: gsm.mode, difficulty: gsm.difficulty, score: gsm.score,
+    hits: gsm.hits, misses: gsm.misses, maxCombo: gsm.maxCombo,
+    accuracy: gsm.getAccuracy(), timeElapsed: gsm.timeElapsed,
+    waveReached: gsm.wave, goldenHits: gsm.goldenHits,
+    bombsHit: gsm.bombsHit, chainCompletes: gsm.chainCompletes,
     perfectWaves: gsm.perfectWaves,
   });
 
   addToLeaderboard({
-    score: gsm.score,
-    mode: MODE_NAMES[gsm.mode],
-    difficulty: gsm.difficulty,
-    accuracy: gsm.getAccuracy(),
-    maxCombo: gsm.maxCombo,
-    date: new Date().toLocaleDateString(),
+    score: gsm.score, mode: MODE_NAMES[gsm.mode],
+    difficulty: gsm.difficulty, accuracy: gsm.getAccuracy(),
+    maxCombo: gsm.maxCombo, date: new Date().toLocaleDateString(),
   });
 
   checkAchievements();
@@ -622,6 +740,24 @@ function updateComboDisplay() {
   setText(doc, 'combo-mult', mult > 1 ? `x${mult}` : '');
 }
 
+// === Power-up HUD ===
+function updatePowerUpHUD() {
+  const doc = getDoc('powerup');
+  if (!doc) return;
+  const effects = powerups.activeEffects;
+  for (let i = 0; i < 3; i++) {
+    const eff = effects[i];
+    if (eff) {
+      const cfg = POWERUP_CONFIGS[eff.type];
+      setText(doc, `pu-name-${i}`, cfg.name);
+      setText(doc, `pu-timer-${i}`, `${Math.ceil(eff.remaining)}s`);
+    } else {
+      setText(doc, `pu-name-${i}`, '');
+      setText(doc, `pu-timer-${i}`, '');
+    }
+  }
+}
+
 // === Hit Detection (Browser) ===
 function setupBrowserInput(container: HTMLDivElement) {
   container.addEventListener('mousemove', (e) => {
@@ -647,11 +783,8 @@ function setupBrowserInput(container: HTMLDivElement) {
 function performStrike(hand: 'left' | 'right' | 'browser' = 'browser') {
   if (state !== 'playing') return;
 
-  // Track hand usage for dual-wield achievement
-  if (hand === 'left') leftHandUsed = true;
-  if (hand === 'right') rightHandUsed = true;
-  if (hand === 'left') gsm.leftHandHits++;
-  if (hand === 'right') gsm.rightHandHits++;
+  if (hand === 'left') { leftHandUsed = true; gsm.leftHandHits++; }
+  if (hand === 'right') { rightHandUsed = true; gsm.rightHandHits++; }
 
   // Raycast from camera
   try {
@@ -659,54 +792,75 @@ function performStrike(hand: 'left' | 'right' | 'browser' = 'browser') {
     if (cam) raycaster.setFromCamera(pointer, cam);
   } catch { /* fallback */ }
 
-  // Check targets
   let hitSomething = false;
   let closestTarget: ActiveTarget | null = null;
   let closestDist = Infinity;
 
-  for (const target of targetSystem.targets) {
-    if (!target.alive) continue;
-    const intersects = raycaster.intersectObject(target.group, true);
+  // Check power-ups first
+  for (const pu of powerups.powerups) {
+    if (!pu.alive) continue;
+    const intersects = raycaster.intersectObject(pu.group, true);
     if (intersects.length > 0 && intersects[0].distance < closestDist) {
-      closestDist = intersects[0].distance;
-      closestTarget = target;
+      // Collect power-up
+      const config = powerups.collect(pu, world.scene);
+      audio.playPowerUpCollect();
+      particles.burst(pu.position.clone().setY(pu.position.y + 0.5), config.color, 15, 3, 0.5);
+      particles.ring(pu.position.clone().setY(pu.position.y + 0.5), config.color, 10);
+      showToast(config.name + '!');
+      if (config.type === PowerUpType.TimeSlow) audio.playTimeSlowStart();
+      hitSomething = true;
+      break; // only collect one
     }
   }
 
-  // Check boss hit zones
-  if (targetSystem.bossGroup) {
-    for (let i = 0; i < targetSystem.bossHitZones.length; i++) {
-      const zone = targetSystem.bossHitZones[i];
-      if (zone.hit) continue;
-      const intersects = raycaster.intersectObject(zone.mesh, true);
-      if (intersects.length > 0) {
-        const defeated = targetSystem.hitBossZone(i, world.scene);
-        audio.playBossHit();
-        const scored = gsm.addHit(250);
-        showToast(`+${scored}`);
-        const zonePos = zone.mesh.getWorldPosition(new Vector3());
-        particles.burst(zonePos, 0x00ffff, 15, 4, 0.6);
-        shatterFx.shatter(zonePos, 0x00ffff, 6, 0.8);
-        screenShake.trigger(0.02);
-        if (defeated) {
-          audio.playBossDefeat();
-          showToast('BOSS DEFEATED!');
-          gsm.score += 2000;
-          tryAchievement('boss_first');
-          particles.ring(new Vector3(0, 1.8, -4), 0xff00ff, 20, 1.5);
-          shatterFx.shatter(new Vector3(0, 1.8, -4), 0xff00ff, 15, 1.5);
-          screenShake.trigger(0.04);
-          waveTransition = true;
-          waveTransitionTimer = 0;
-        }
-        hitSomething = true;
+  if (!hitSomething) {
+    // Check targets
+    for (const target of targetSystem.targets) {
+      if (!target.alive) continue;
+      const intersects = raycaster.intersectObject(target.group, true);
+      if (intersects.length > 0 && intersects[0].distance < closestDist) {
+        closestDist = intersects[0].distance;
+        closestTarget = target;
       }
     }
-  }
 
-  if (closestTarget) {
-    hitTarget(closestTarget);
-    hitSomething = true;
+    // Check boss hit zones
+    if (targetSystem.bossGroup) {
+      for (let i = 0; i < targetSystem.bossHitZones.length; i++) {
+        const zone = targetSystem.bossHitZones[i];
+        if (zone.hit) continue;
+        const intersects = raycaster.intersectObject(zone.mesh, true);
+        if (intersects.length > 0) {
+          const defeated = targetSystem.hitBossZone(i, world.scene);
+          audio.playBossHit();
+          let pts = 250;
+          if (powerups.doublePoints) pts *= 2;
+          const scored = gsm.addHit(pts);
+          showToast(`+${scored}`);
+          const zonePos = zone.mesh.getWorldPosition(new Vector3());
+          particles.burst(zonePos, 0x00ffff, 15, 4, 0.6);
+          shatterFx.shatter(zonePos, 0x00ffff, 6, 0.8);
+          screenShake.trigger(0.02);
+          if (defeated) {
+            audio.playBossDefeat();
+            showToast('BOSS DEFEATED!');
+            gsm.score += 2000;
+            tryAchievement('boss_first');
+            particles.ring(new Vector3(0, 1.8, -4), 0xff00ff, 20, 1.5);
+            shatterFx.shatter(new Vector3(0, 1.8, -4), 0xff00ff, 15, 1.5);
+            screenShake.trigger(0.04);
+            waveTransition = true;
+            waveTransitionTimer = 0;
+          }
+          hitSomething = true;
+        }
+      }
+    }
+
+    if (closestTarget) {
+      hitTarget(closestTarget);
+      hitSomething = true;
+    }
   }
 
   if (!hitSomething) {
@@ -714,10 +868,7 @@ function performStrike(hand: 'left' | 'right' | 'browser' = 'browser') {
     audio.playMiss();
   }
 
-  // Check dual-wield achievement
-  if (leftHandUsed && rightHandUsed) {
-    tryAchievement('dual_wield');
-  }
+  if (leftHandUsed && rightHandUsed) tryAchievement('dual_wield');
 }
 
 function hitTarget(target: ActiveTarget) {
@@ -725,6 +876,15 @@ function hitTarget(target: ActiveTarget) {
   const pos = target.group.position.clone();
 
   if (config.type === 'bomb') {
+    // Shield blocks bomb damage
+    if (powerups.shield) {
+      showToast('SHIELD BLOCKED!');
+      particles.burst(pos, 0x44ff88, 12, 3, 0.4);
+      audio.playHit(1);
+      targetSystem.removeTarget(target, world.scene);
+      return;
+    }
+
     gsm.score += config.points;
     gsm.combo = 0;
     gsm.bombsHit++;
@@ -758,7 +918,14 @@ function hitTarget(target: ActiveTarget) {
 
   gsm.totalTargets++;
   gsm.waveTargets++;
-  const scored = gsm.addHit(config.points);
+  let points = config.points;
+
+  // Apply power-up multipliers
+  if (powerups.doublePoints) points *= 2;
+  // Apply challenge multiplier
+  if (isPlayingChallenge && challengeConfig) points = Math.round(points * challengeConfig.pointsMult);
+
+  const scored = gsm.addHit(points);
 
   // Type-specific effects
   switch (config.type) {
@@ -810,35 +977,21 @@ function handleXRInput() {
     const xrInput = (world.input as any).xr;
     if (!xrInput) return;
 
-    // Right controller
     const rightGamepad = xrInput.gamepads?.right;
     if (rightGamepad) {
       const triggerDown = rightGamepad.getButtonDown?.(InputComponent.Trigger);
       const bDown = rightGamepad.getButtonDown?.(InputComponent.B_Button);
-
-      if (state === 'playing' && triggerDown) {
-        performStrike('right');
-      }
-      if (state === 'playing' && bDown) {
-        changeState('paused');
-      }
-      if (state === 'paused' && bDown) {
-        changeState('playing');
-      }
+      if (state === 'playing' && triggerDown) performStrike('right');
+      if (state === 'playing' && bDown) changeState('paused');
+      if (state === 'paused' && bDown) changeState('playing');
     }
 
-    // Left controller (dual-wielding!)
     const leftGamepad = xrInput.gamepads?.left;
     if (leftGamepad) {
       const triggerDown = leftGamepad.getButtonDown?.(InputComponent.Trigger);
-      const xDown = leftGamepad.getButtonDown?.(InputComponent.A_Button); // X on left
-
-      if (state === 'playing' && triggerDown) {
-        performStrike('left');
-      }
-      if (xDown) {
-        audio.playButtonClick();
-      }
+      const xDown = leftGamepad.getButtonDown?.(InputComponent.A_Button);
+      if (state === 'playing' && triggerDown) performStrike('left');
+      if (xDown) audio.playButtonClick();
     }
   } catch { /* XR not available */ }
 }
@@ -887,7 +1040,15 @@ function populateGameOver() {
   const doc = getDoc('gameover');
   if (!doc) return;
   const completed = gsm.lives > 0 || gsm.mode === GameMode.SpeedRush || gsm.mode === GameMode.Precision;
-  setText(doc, 'go-title', completed ? 'WELL DONE!' : 'GAME OVER');
+  let title = completed ? 'WELL DONE!' : 'GAME OVER';
+  if (isPlayingChallenge && currentChallenge) {
+    if (completed && gsm.score >= currentChallenge.targetScore) {
+      title = 'CHALLENGE COMPLETE!';
+    } else {
+      title = 'CHALLENGE FAILED';
+    }
+  }
+  setText(doc, 'go-title', title);
   setText(doc, 'go-score', `Score: ${gsm.score}`);
   setText(doc, 'go-hits', `Hits: ${gsm.hits}`);
   setText(doc, 'go-accuracy', `Accuracy: ${gsm.getAccuracy()}%`);
@@ -968,6 +1129,32 @@ function populateSkins() {
   });
 }
 
+function populateChallenge() {
+  const doc = getDoc('challenge');
+  if (!doc) return;
+  const challenge = generateDailyChallenge();
+  const completed = isChallengeCompleted(challenge.date);
+  const streak = getChallengeStreak();
+
+  setText(doc, 'ch-title', challenge.title);
+  setText(doc, 'ch-desc', challenge.modifiers.map(m => m.description).join(' | '));
+  setText(doc, 'ch-detail', `Mode: ${MODE_NAMES[challenge.mode]} | ${challenge.difficulty.toUpperCase()}`);
+  setText(doc, 'ch-target', `Target: ${challenge.targetScore.toLocaleString()} pts`);
+  setText(doc, 'ch-streak', streak > 0 ? `Streak: ${streak} day${streak > 1 ? 's' : ''}` : 'No streak yet');
+  setText(doc, 'ch-status', completed ? 'COMPLETED TODAY!' : '');
+}
+
+function populateTutorial() {
+  const doc = getDoc('tutorial');
+  if (!doc) return;
+  const step = TUTORIAL_STEPS[tutorialStep];
+  if (!step) return;
+  setText(doc, 'tut-step', `Step ${tutorialStep + 1} / ${TUTORIAL_STEPS.length}`);
+  setText(doc, 'tut-title', step.title);
+  setText(doc, 'tut-desc', step.desc);
+  setText(doc, 'tut-progress', step.hint);
+}
+
 // === Achievements ===
 function tryAchievement(id: string) {
   const unlocked = loadAchievements();
@@ -993,7 +1180,6 @@ function checkAchievements() {
   if (gsm.mode === GameMode.Endless && gsm.wave >= 10) tryAchievement('wave_10');
   if (gsm.modesPlayed.size >= 5) tryAchievement('all_modes');
 
-  // Total smash count from stats
   const stats = loadStats();
   if (stats.totalTargetsSmashed >= 1000) tryAchievement('total_1000');
   if (stats.totalGamesPlayed >= 10) tryAchievement('games_10');
