@@ -1,0 +1,418 @@
+{
+  "element": {
+    "type": "container",
+    "sourceTag": "div",
+    "children": [
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "NEON SMASH"
+        ],
+        "properties": {
+          "class": "game-title"
+        },
+        "dataUid": "uid-2"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "HOLODECK TARGET ARENA"
+        ],
+        "properties": {
+          "class": "subtitle"
+        },
+        "dataUid": "uid-3"
+      },
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "PLAY"
+            ],
+            "properties": {
+              "class": "btn-text"
+            },
+            "dataUid": "uid-5"
+          }
+        ],
+        "properties": {
+          "id": "btn-play",
+          "class": "btn"
+        },
+        "dataUid": "uid-4"
+      },
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "LEADERBOARD"
+            ],
+            "properties": {
+              "class": "btn-small-text"
+            },
+            "dataUid": "uid-7"
+          }
+        ],
+        "properties": {
+          "id": "btn-leaderboard",
+          "class": "btn-small"
+        },
+        "dataUid": "uid-6"
+      },
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "ACHIEVEMENTS"
+            ],
+            "properties": {
+              "class": "btn-small-text"
+            },
+            "dataUid": "uid-9"
+          }
+        ],
+        "properties": {
+          "id": "btn-achievements",
+          "class": "btn-small"
+        },
+        "dataUid": "uid-8"
+      },
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "SETTINGS"
+            ],
+            "properties": {
+              "class": "btn-small-text"
+            },
+            "dataUid": "uid-11"
+          }
+        ],
+        "properties": {
+          "id": "btn-settings",
+          "class": "btn-small"
+        },
+        "dataUid": "uid-10"
+      },
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "HELP"
+            ],
+            "properties": {
+              "class": "btn-small-text"
+            },
+            "dataUid": "uid-13"
+          }
+        ],
+        "properties": {
+          "id": "btn-help",
+          "class": "btn-small"
+        },
+        "dataUid": "uid-12"
+      }
+    ],
+    "properties": {
+      "class": "title-panel"
+    },
+    "dataUid": "uid-1"
+  },
+  "classes": {
+    "title-panel": {
+      "content": {
+        "display": "flex",
+        "flexDirection": "column",
+        "alignItems": "center",
+        "paddingTop": "3",
+        "paddingBottom": "3",
+        "paddingLeft": "4",
+        "paddingRight": "4",
+        "backgroundColor": "rgba(0, 0, 0, 0.85)",
+        "borderColor": "#00ffff",
+        "borderWidth": "0.15",
+        "borderRadius": 1.5
+      }
+    },
+    "game-title": {
+      "content": {
+        "fontSize": "5",
+        "color": "#00ffff",
+        "fontWeight": "bold"
+      }
+    },
+    "subtitle": {
+      "content": {
+        "fontSize": "1.8",
+        "color": "#888888",
+        "marginTop": "0.5"
+      }
+    },
+    "btn": {
+      "content": {
+        "marginTop": "1.5",
+        "paddingTop": "1",
+        "paddingBottom": "1",
+        "paddingLeft": "3",
+        "paddingRight": "3",
+        "backgroundColor": "rgba(0, 255, 255, 0.15)",
+        "borderColor": "#00ffff",
+        "borderWidth": "0.08",
+        "borderRadius": 0.8,
+        "cursor": "pointer"
+      }
+    },
+    "btn-text": {
+      "content": {
+        "fontSize": "2",
+        "color": "#00ffff",
+        "fontWeight": "bold"
+      }
+    },
+    "btn-small": {
+      "content": {
+        "marginTop": "1",
+        "paddingTop": "0.6",
+        "paddingBottom": "0.6",
+        "paddingLeft": "2",
+        "paddingRight": "2",
+        "backgroundColor": "rgba(0, 255, 255, 0.08)",
+        "borderColor": "#00aaaa",
+        "borderWidth": "0.06",
+        "borderRadius": 0.6,
+        "cursor": "pointer"
+      }
+    },
+    "btn-small-text": {
+      "content": {
+        "fontSize": "1.5",
+        "color": "#00aaaa"
+      }
+    }
+  },
+  "ranges": {
+    "title-panel": {
+      "start": {
+        "line": 1,
+        "column": 2
+      },
+      "end": {
+        "line": 1,
+        "column": 14
+      }
+    },
+    "game-title": {
+      "start": {
+        "line": 14,
+        "column": 2
+      },
+      "end": {
+        "line": 14,
+        "column": 13
+      }
+    },
+    "subtitle": {
+      "start": {
+        "line": 19,
+        "column": 2
+      },
+      "end": {
+        "line": 19,
+        "column": 11
+      }
+    },
+    "btn": {
+      "start": {
+        "line": 24,
+        "column": 2
+      },
+      "end": {
+        "line": 24,
+        "column": 6
+      }
+    },
+    "btn-text": {
+      "start": {
+        "line": 36,
+        "column": 2
+      },
+      "end": {
+        "line": 36,
+        "column": 11
+      }
+    },
+    "btn-small": {
+      "start": {
+        "line": 41,
+        "column": 2
+      },
+      "end": {
+        "line": 41,
+        "column": 12
+      }
+    },
+    "btn-small-text": {
+      "start": {
+        "line": 53,
+        "column": 2
+      },
+      "end": {
+        "line": 53,
+        "column": 17
+      }
+    },
+    "uid-1": {
+      "start": {
+        "line": 58,
+        "column": 0
+      },
+      "end": {
+        "line": 66,
+        "column": 6
+      }
+    },
+    "uid-2": {
+      "start": {
+        "line": 59,
+        "column": 2
+      },
+      "end": {
+        "line": 59,
+        "column": 44
+      }
+    },
+    "uid-3": {
+      "start": {
+        "line": 60,
+        "column": 2
+      },
+      "end": {
+        "line": 60,
+        "column": 53
+      }
+    },
+    "uid-4": {
+      "start": {
+        "line": 61,
+        "column": 2
+      },
+      "end": {
+        "line": 61,
+        "column": 73
+      }
+    },
+    "uid-5": {
+      "start": {
+        "line": 61,
+        "column": 33
+      },
+      "end": {
+        "line": 61,
+        "column": 67
+      }
+    },
+    "uid-6": {
+      "start": {
+        "line": 62,
+        "column": 2
+      },
+      "end": {
+        "line": 62,
+        "column": 99
+      }
+    },
+    "uid-7": {
+      "start": {
+        "line": 62,
+        "column": 46
+      },
+      "end": {
+        "line": 62,
+        "column": 93
+      }
+    },
+    "uid-8": {
+      "start": {
+        "line": 63,
+        "column": 2
+      },
+      "end": {
+        "line": 63,
+        "column": 101
+      }
+    },
+    "uid-9": {
+      "start": {
+        "line": 63,
+        "column": 47
+      },
+      "end": {
+        "line": 63,
+        "column": 95
+      }
+    },
+    "uid-10": {
+      "start": {
+        "line": 64,
+        "column": 2
+      },
+      "end": {
+        "line": 64,
+        "column": 93
+      }
+    },
+    "uid-11": {
+      "start": {
+        "line": 64,
+        "column": 43
+      },
+      "end": {
+        "line": 64,
+        "column": 87
+      }
+    },
+    "uid-12": {
+      "start": {
+        "line": 65,
+        "column": 2
+      },
+      "end": {
+        "line": 65,
+        "column": 85
+      }
+    },
+    "uid-13": {
+      "start": {
+        "line": 65,
+        "column": 39
+      },
+      "end": {
+        "line": 65,
+        "column": 79
+      }
+    }
+  }
+}

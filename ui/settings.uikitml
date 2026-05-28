@@ -1,0 +1,95 @@
+<style>
+  .set-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2;
+    padding-bottom: 2;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(0, 0, 0, 0.9);
+    border-color: #00ffff;
+    border-width: 0.12;
+    border-radius: 1.5;
+  }
+  .set-title {
+    font-size: 3;
+    color: #00ffff;
+    font-weight: bold;
+  }
+  .set-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 1;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .set-label {
+    font-size: 1.6;
+    color: #aaaaaa;
+  }
+  .set-val {
+    font-size: 1.6;
+    color: #00ffff;
+    font-weight: bold;
+  }
+  .adj-btn {
+    padding-top: 0.4;
+    padding-bottom: 0.4;
+    padding-left: 1;
+    padding-right: 1;
+    background-color: rgba(0, 255, 255, 0.1);
+    border-color: #00aaaa;
+    border-width: 0.05;
+    border-radius: 0.4;
+    cursor: pointer;
+    margin-left: 0.5;
+    margin-right: 0.5;
+  }
+  .adj-text {
+    font-size: 1.4;
+    color: #00aaaa;
+  }
+  .back-btn {
+    margin-top: 2;
+    padding-top: 0.5;
+    padding-bottom: 0.5;
+    padding-left: 2;
+    padding-right: 2;
+    background-color: rgba(255, 100, 100, 0.1);
+    border-color: #ff6666;
+    border-width: 0.06;
+    border-radius: 0.5;
+    cursor: pointer;
+  }
+  .back-text { font-size: 1.4; color: #ff6666; }
+</style>
+<div class="set-panel">
+  <span class="set-title">SETTINGS</span>
+  <div class="set-row">
+    <span class="set-label">Master</span>
+    <div id="btn-master-down" class="adj-btn"><span class="adj-text">-</span></div>
+    <span id="val-master" class="set-val">70%</span>
+    <div id="btn-master-up" class="adj-btn"><span class="adj-text">+</span></div>
+  </div>
+  <div class="set-row">
+    <span class="set-label">SFX</span>
+    <div id="btn-sfx-down" class="adj-btn"><span class="adj-text">-</span></div>
+    <span id="val-sfx" class="set-val">80%</span>
+    <div id="btn-sfx-up" class="adj-btn"><span class="adj-text">+</span></div>
+  </div>
+  <div class="set-row">
+    <span class="set-label">Music</span>
+    <div id="btn-music-down" class="adj-btn"><span class="adj-text">-</span></div>
+    <span id="val-music" class="set-val">50%</span>
+    <div id="btn-music-up" class="adj-btn"><span class="adj-text">+</span></div>
+  </div>
+  <div class="set-row">
+    <span class="set-label">Theme</span>
+    <div id="btn-theme-prev" class="adj-btn"><span class="adj-text">&lt;</span></div>
+    <span id="val-theme" class="set-val">Holodeck</span>
+    <div id="btn-theme-next" class="adj-btn"><span class="adj-text">&gt;</span></div>
+  </div>
+  <div id="btn-back-settings" class="back-btn"><span class="back-text">BACK</span></div>
+</div>

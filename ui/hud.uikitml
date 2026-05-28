@@ -1,0 +1,47 @@
+<style>
+  .hud-panel {
+    display: flex;
+    flex-direction: column;
+    padding-top: 1;
+    padding-bottom: 1;
+    padding-left: 2;
+    padding-right: 2;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-color: #00ffff;
+    border-width: 0.08;
+    border-radius: 0.8;
+  }
+  .hud-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .score-text {
+    font-size: 3;
+    color: #00ffff;
+    font-weight: bold;
+  }
+  .combo-text {
+    font-size: 2.2;
+    color: #ffff00;
+    font-weight: bold;
+  }
+  .info-text {
+    font-size: 1.6;
+    color: #aaaaaa;
+  }
+  .lives-text {
+    font-size: 1.6;
+    color: #ff4444;
+  }
+</style>
+<div class="hud-panel">
+  <div class="hud-row">
+    <span id="hud-score" class="score-text">0</span>
+    <span id="hud-combo" class="combo-text"></span>
+  </div>
+  <div class="hud-row">
+    <span id="hud-info" class="info-text">W1</span>
+    <span id="hud-lives" class="lives-text">***</span>
+  </div>
+</div>

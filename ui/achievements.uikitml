@@ -1,0 +1,62 @@
+<style>
+  .ach-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2;
+    padding-bottom: 2;
+    padding-left: 2;
+    padding-right: 2;
+    background-color: rgba(0, 0, 0, 0.9);
+    border-color: #ff88ff;
+    border-width: 0.12;
+    border-radius: 1.5;
+  }
+  .ach-title {
+    font-size: 3;
+    color: #ff88ff;
+    font-weight: bold;
+  }
+  .ach-entry {
+    font-size: 1.1;
+    color: #aaaaaa;
+    margin-top: 0.3;
+  }
+  .back-btn {
+    margin-top: 1.5;
+    padding-top: 0.5;
+    padding-bottom: 0.5;
+    padding-left: 2;
+    padding-right: 2;
+    background-color: rgba(255, 100, 100, 0.1);
+    border-color: #ff6666;
+    border-width: 0.06;
+    border-radius: 0.5;
+    cursor: pointer;
+  }
+  .back-text { font-size: 1.4; color: #ff6666; }
+</style>
+<div class="ach-panel">
+  <span class="ach-title">ACHIEVEMENTS</span>
+  <span id="ach-0" class="ach-entry">[ ] ---</span>
+  <span id="ach-1" class="ach-entry">[ ] ---</span>
+  <span id="ach-2" class="ach-entry">[ ] ---</span>
+  <span id="ach-3" class="ach-entry">[ ] ---</span>
+  <span id="ach-4" class="ach-entry">[ ] ---</span>
+  <span id="ach-5" class="ach-entry">[ ] ---</span>
+  <span id="ach-6" class="ach-entry">[ ] ---</span>
+  <span id="ach-7" class="ach-entry">[ ] ---</span>
+  <span id="ach-8" class="ach-entry">[ ] ---</span>
+  <span id="ach-9" class="ach-entry">[ ] ---</span>
+  <span id="ach-10" class="ach-entry">[ ] ---</span>
+  <span id="ach-11" class="ach-entry">[ ] ---</span>
+  <span id="ach-12" class="ach-entry">[ ] ---</span>
+  <span id="ach-13" class="ach-entry">[ ] ---</span>
+  <span id="ach-14" class="ach-entry">[ ] ---</span>
+  <span id="ach-15" class="ach-entry">[ ] ---</span>
+  <span id="ach-16" class="ach-entry">[ ] ---</span>
+  <span id="ach-17" class="ach-entry">[ ] ---</span>
+  <span id="ach-18" class="ach-entry">[ ] ---</span>
+  <span id="ach-19" class="ach-entry">[ ] ---</span>
+  <div id="btn-back-achievements" class="back-btn"><span class="back-text">BACK</span></div>
+</div>

@@ -1,0 +1,86 @@
+<style>
+  .mode-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2;
+    padding-bottom: 2;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(0, 0, 0, 0.85);
+    border-color: #00ffff;
+    border-width: 0.12;
+    border-radius: 1.5;
+  }
+  .mode-title {
+    font-size: 3;
+    color: #00ffff;
+    font-weight: bold;
+  }
+  .mode-btn {
+    margin-top: 1;
+    padding-top: 0.8;
+    padding-bottom: 0.8;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(0, 255, 255, 0.1);
+    border-color: #00aaaa;
+    border-width: 0.06;
+    border-radius: 0.6;
+    cursor: pointer;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .mode-name {
+    font-size: 2;
+    color: #00ffff;
+    font-weight: bold;
+  }
+  .mode-desc {
+    font-size: 1.2;
+    color: #666666;
+    margin-top: 0.2;
+  }
+  .back-btn {
+    margin-top: 1.5;
+    padding-top: 0.5;
+    padding-bottom: 0.5;
+    padding-left: 2;
+    padding-right: 2;
+    background-color: rgba(255, 100, 100, 0.1);
+    border-color: #ff6666;
+    border-width: 0.06;
+    border-radius: 0.5;
+    cursor: pointer;
+  }
+  .back-text {
+    font-size: 1.4;
+    color: #ff6666;
+  }
+</style>
+<div class="mode-panel">
+  <span class="mode-title">SELECT MODE</span>
+  <div id="btn-classic" class="mode-btn">
+    <span class="mode-name">CLASSIC</span>
+    <span class="mode-desc">10 waves, 3 lives</span>
+  </div>
+  <div id="btn-speedrush" class="mode-btn">
+    <span class="mode-name">SPEED RUSH</span>
+    <span class="mode-desc">60 seconds, max score</span>
+  </div>
+  <div id="btn-precision" class="mode-btn">
+    <span class="mode-name">PRECISION</span>
+    <span class="mode-desc">30 targets, accuracy matters</span>
+  </div>
+  <div id="btn-endless" class="mode-btn">
+    <span class="mode-name">ENDLESS</span>
+    <span class="mode-desc">Infinite waves, 3 lives</span>
+  </div>
+  <div id="btn-bosswave" class="mode-btn">
+    <span class="mode-name">BOSS WAVE</span>
+    <span class="mode-desc">Giant multi-zone bosses</span>
+  </div>
+  <div id="btn-back-mode" class="back-btn"><span class="back-text">BACK</span></div>
+</div>

@@ -1,0 +1,58 @@
+<style>
+  .pause-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 3;
+    padding-bottom: 3;
+    padding-left: 4;
+    padding-right: 4;
+    background-color: rgba(0, 0, 0, 0.9);
+    border-color: #ffff00;
+    border-width: 0.12;
+    border-radius: 1.5;
+  }
+  .pause-title {
+    font-size: 4;
+    color: #ffff00;
+    font-weight: bold;
+  }
+  .btn {
+    margin-top: 1.5;
+    padding-top: 1;
+    padding-bottom: 1;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(255, 255, 0, 0.12);
+    border-color: #ffff00;
+    border-width: 0.08;
+    border-radius: 0.7;
+    cursor: pointer;
+  }
+  .btn-text {
+    font-size: 2;
+    color: #ffff00;
+    font-weight: bold;
+  }
+  .quit-btn {
+    margin-top: 1;
+    padding-top: 0.8;
+    padding-bottom: 0.8;
+    padding-left: 2;
+    padding-right: 2;
+    background-color: rgba(255, 100, 100, 0.1);
+    border-color: #ff6666;
+    border-width: 0.06;
+    border-radius: 0.5;
+    cursor: pointer;
+  }
+  .quit-text {
+    font-size: 1.6;
+    color: #ff6666;
+  }
+</style>
+<div class="pause-panel">
+  <span class="pause-title">PAUSED</span>
+  <div id="btn-resume" class="btn"><span class="btn-text">RESUME</span></div>
+  <div id="btn-quit" class="quit-btn"><span class="quit-text">QUIT TO TITLE</span></div>
+</div>

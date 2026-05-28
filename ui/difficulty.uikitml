@@ -1,0 +1,56 @@
+<style>
+  .diff-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2;
+    padding-bottom: 2;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(0, 0, 0, 0.85);
+    border-color: #00ffff;
+    border-width: 0.12;
+    border-radius: 1.5;
+  }
+  .diff-title {
+    font-size: 3;
+    color: #00ffff;
+    font-weight: bold;
+  }
+  .diff-btn {
+    margin-top: 1.2;
+    padding-top: 1;
+    padding-bottom: 1;
+    padding-left: 4;
+    padding-right: 4;
+    border-width: 0.08;
+    border-radius: 0.7;
+    cursor: pointer;
+  }
+  .easy { background-color: rgba(0, 255, 100, 0.12); border-color: #00ff66; }
+  .medium { background-color: rgba(255, 200, 0, 0.12); border-color: #ffcc00; }
+  .hard { background-color: rgba(255, 50, 50, 0.12); border-color: #ff3333; }
+  .diff-text-easy { font-size: 2.2; color: #00ff66; font-weight: bold; }
+  .diff-text-med { font-size: 2.2; color: #ffcc00; font-weight: bold; }
+  .diff-text-hard { font-size: 2.2; color: #ff3333; font-weight: bold; }
+  .back-btn {
+    margin-top: 1.5;
+    padding-top: 0.5;
+    padding-bottom: 0.5;
+    padding-left: 2;
+    padding-right: 2;
+    background-color: rgba(255, 100, 100, 0.1);
+    border-color: #ff6666;
+    border-width: 0.06;
+    border-radius: 0.5;
+    cursor: pointer;
+  }
+  .back-text { font-size: 1.4; color: #ff6666; }
+</style>
+<div class="diff-panel">
+  <span class="diff-title">DIFFICULTY</span>
+  <div id="btn-easy" class="diff-btn easy"><span class="diff-text-easy">EASY</span></div>
+  <div id="btn-medium" class="diff-btn medium"><span class="diff-text-med">MEDIUM</span></div>
+  <div id="btn-hard" class="diff-btn hard"><span class="diff-text-hard">HARD</span></div>
+  <div id="btn-back-diff" class="back-btn"><span class="back-text">BACK</span></div>
+</div>

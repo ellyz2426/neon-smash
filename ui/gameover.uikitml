@@ -1,0 +1,71 @@
+<style>
+  .go-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2;
+    padding-bottom: 2;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(0, 0, 0, 0.9);
+    border-color: #00ffff;
+    border-width: 0.12;
+    border-radius: 1.5;
+  }
+  .go-title {
+    font-size: 4;
+    color: #00ffff;
+    font-weight: bold;
+  }
+  .go-stat {
+    font-size: 1.6;
+    color: #aaaaaa;
+    margin-top: 0.5;
+  }
+  .go-score {
+    font-size: 2.5;
+    color: #ffff00;
+    font-weight: bold;
+    margin-top: 0.8;
+  }
+  .btn {
+    margin-top: 1.5;
+    padding-top: 0.8;
+    padding-bottom: 0.8;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(0, 255, 255, 0.12);
+    border-color: #00ffff;
+    border-width: 0.08;
+    border-radius: 0.7;
+    cursor: pointer;
+  }
+  .btn-text {
+    font-size: 1.8;
+    color: #00ffff;
+    font-weight: bold;
+  }
+  .title-btn {
+    margin-top: 0.8;
+    padding-top: 0.6;
+    padding-bottom: 0.6;
+    padding-left: 2;
+    padding-right: 2;
+    background-color: rgba(255, 100, 100, 0.1);
+    border-color: #ff6666;
+    border-width: 0.06;
+    border-radius: 0.5;
+    cursor: pointer;
+  }
+  .title-text { font-size: 1.4; color: #ff6666; }
+</style>
+<div class="go-panel">
+  <span id="go-title" class="go-title">GAME OVER</span>
+  <span id="go-score" class="go-score">Score: 0</span>
+  <span id="go-hits" class="go-stat">Hits: 0</span>
+  <span id="go-accuracy" class="go-stat">Accuracy: 0%</span>
+  <span id="go-combo" class="go-stat">Max Combo: 0x</span>
+  <span id="go-mode" class="go-stat">Mode: CLASSIC</span>
+  <div id="btn-rematch" class="btn"><span class="btn-text">REMATCH</span></div>
+  <div id="btn-title" class="title-btn"><span class="title-text">TITLE SCREEN</span></div>
+</div>

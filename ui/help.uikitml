@@ -1,0 +1,67 @@
+<style>
+  .help-panel {
+    display: flex;
+    flex-direction: column;
+    padding-top: 2;
+    padding-bottom: 2;
+    padding-left: 2;
+    padding-right: 2;
+    background-color: rgba(0, 0, 0, 0.9);
+    border-color: #00ffff;
+    border-width: 0.12;
+    border-radius: 1.5;
+  }
+  .help-title {
+    font-size: 3;
+    color: #00ffff;
+    font-weight: bold;
+  }
+  .help-section {
+    font-size: 1.8;
+    color: #ffff00;
+    font-weight: bold;
+    margin-top: 1.2;
+  }
+  .help-text {
+    font-size: 1.2;
+    color: #aaaaaa;
+    margin-top: 0.3;
+  }
+  .back-btn {
+    margin-top: 1.5;
+    padding-top: 0.5;
+    padding-bottom: 0.5;
+    padding-left: 2;
+    padding-right: 2;
+    background-color: rgba(255, 100, 100, 0.1);
+    border-color: #ff6666;
+    border-width: 0.06;
+    border-radius: 0.5;
+    cursor: pointer;
+    align-self: center;
+  }
+  .back-text { font-size: 1.4; color: #ff6666; }
+</style>
+<div class="help-panel">
+  <span class="help-title">HOW TO PLAY</span>
+  <span class="help-section">Browser Controls</span>
+  <span class="help-text">Mouse: Aim at targets</span>
+  <span class="help-text">Click: Strike target</span>
+  <span class="help-text">ESC: Pause / Resume</span>
+  <span class="help-section">VR Controls</span>
+  <span class="help-text">Trigger: Strike target</span>
+  <span class="help-text">Laser Pointer: Aim at targets</span>
+  <span class="help-text">B Button: Pause</span>
+  <span class="help-text">A Button: Confirm</span>
+  <span class="help-section">Target Types</span>
+  <span class="help-text">Cyan: Normal (100 pts)</span>
+  <span class="help-text">Yellow: Speed (200 pts, brief)</span>
+  <span class="help-text">Orange: Armored (300 pts, 2 hits)</span>
+  <span class="help-text">Red: BOMB (avoid! -500 pts)</span>
+  <span class="help-text">Gold: Golden (500 pts, rare)</span>
+  <span class="help-text">Green: Chain (350 pts, sequence)</span>
+  <span class="help-section">Combos</span>
+  <span class="help-text">Hit consecutively for multipliers</span>
+  <span class="help-text">5+ hits: 2x | 10+: 3x | 15+: 5x | 25+: 10x</span>
+  <div id="btn-back-help" class="back-btn"><span class="back-text">BACK</span></div>
+</div>

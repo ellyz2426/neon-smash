@@ -1,0 +1,418 @@
+{
+  "element": {
+    "type": "container",
+    "sourceTag": "div",
+    "children": [
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "DIFFICULTY"
+        ],
+        "properties": {
+          "class": "diff-title"
+        },
+        "dataUid": "uid-2"
+      },
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "EASY"
+            ],
+            "properties": {
+              "class": "diff-text-easy"
+            },
+            "dataUid": "uid-4"
+          }
+        ],
+        "properties": {
+          "id": "btn-easy",
+          "class": "diff-btn easy"
+        },
+        "dataUid": "uid-3"
+      },
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "MEDIUM"
+            ],
+            "properties": {
+              "class": "diff-text-med"
+            },
+            "dataUid": "uid-6"
+          }
+        ],
+        "properties": {
+          "id": "btn-medium",
+          "class": "diff-btn medium"
+        },
+        "dataUid": "uid-5"
+      },
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "HARD"
+            ],
+            "properties": {
+              "class": "diff-text-hard"
+            },
+            "dataUid": "uid-8"
+          }
+        ],
+        "properties": {
+          "id": "btn-hard",
+          "class": "diff-btn hard"
+        },
+        "dataUid": "uid-7"
+      },
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "BACK"
+            ],
+            "properties": {
+              "class": "back-text"
+            },
+            "dataUid": "uid-10"
+          }
+        ],
+        "properties": {
+          "id": "btn-back-diff",
+          "class": "back-btn"
+        },
+        "dataUid": "uid-9"
+      }
+    ],
+    "properties": {
+      "class": "diff-panel"
+    },
+    "dataUid": "uid-1"
+  },
+  "classes": {
+    "diff-panel": {
+      "content": {
+        "display": "flex",
+        "flexDirection": "column",
+        "alignItems": "center",
+        "paddingTop": "2",
+        "paddingBottom": "2",
+        "paddingLeft": "3",
+        "paddingRight": "3",
+        "backgroundColor": "rgba(0, 0, 0, 0.85)",
+        "borderColor": "#00ffff",
+        "borderWidth": "0.12",
+        "borderRadius": 1.5
+      }
+    },
+    "diff-title": {
+      "content": {
+        "fontSize": "3",
+        "color": "#00ffff",
+        "fontWeight": "bold"
+      }
+    },
+    "diff-btn": {
+      "content": {
+        "marginTop": "1.2",
+        "paddingTop": "1",
+        "paddingBottom": "1",
+        "paddingLeft": "4",
+        "paddingRight": "4",
+        "borderWidth": "0.08",
+        "borderRadius": 0.7,
+        "cursor": "pointer"
+      }
+    },
+    "easy": {
+      "content": {
+        "backgroundColor": "rgba(0, 255, 100, 0.12)",
+        "borderColor": "#00ff66"
+      }
+    },
+    "medium": {
+      "content": {
+        "backgroundColor": "rgba(255, 200, 0, 0.12)",
+        "borderColor": "#ffcc00"
+      }
+    },
+    "hard": {
+      "content": {
+        "backgroundColor": "rgba(255, 50, 50, 0.12)",
+        "borderColor": "#ff3333"
+      }
+    },
+    "diff-text-easy": {
+      "content": {
+        "fontSize": "2.2",
+        "color": "#00ff66",
+        "fontWeight": "bold"
+      }
+    },
+    "diff-text-med": {
+      "content": {
+        "fontSize": "2.2",
+        "color": "#ffcc00",
+        "fontWeight": "bold"
+      }
+    },
+    "diff-text-hard": {
+      "content": {
+        "fontSize": "2.2",
+        "color": "#ff3333",
+        "fontWeight": "bold"
+      }
+    },
+    "back-btn": {
+      "content": {
+        "marginTop": "1.5",
+        "paddingTop": "0.5",
+        "paddingBottom": "0.5",
+        "paddingLeft": "2",
+        "paddingRight": "2",
+        "backgroundColor": "rgba(255, 100, 100, 0.1)",
+        "borderColor": "#ff6666",
+        "borderWidth": "0.06",
+        "borderRadius": 0.5,
+        "cursor": "pointer"
+      }
+    },
+    "back-text": {
+      "content": {
+        "fontSize": "1.4",
+        "color": "#ff6666"
+      }
+    }
+  },
+  "ranges": {
+    "diff-panel": {
+      "start": {
+        "line": 1,
+        "column": 2
+      },
+      "end": {
+        "line": 1,
+        "column": 13
+      }
+    },
+    "diff-title": {
+      "start": {
+        "line": 14,
+        "column": 2
+      },
+      "end": {
+        "line": 14,
+        "column": 13
+      }
+    },
+    "diff-btn": {
+      "start": {
+        "line": 19,
+        "column": 2
+      },
+      "end": {
+        "line": 19,
+        "column": 11
+      }
+    },
+    "easy": {
+      "start": {
+        "line": 29,
+        "column": 2
+      },
+      "end": {
+        "line": 29,
+        "column": 7
+      }
+    },
+    "medium": {
+      "start": {
+        "line": 30,
+        "column": 2
+      },
+      "end": {
+        "line": 30,
+        "column": 9
+      }
+    },
+    "hard": {
+      "start": {
+        "line": 31,
+        "column": 2
+      },
+      "end": {
+        "line": 31,
+        "column": 7
+      }
+    },
+    "diff-text-easy": {
+      "start": {
+        "line": 32,
+        "column": 2
+      },
+      "end": {
+        "line": 32,
+        "column": 17
+      }
+    },
+    "diff-text-med": {
+      "start": {
+        "line": 33,
+        "column": 2
+      },
+      "end": {
+        "line": 33,
+        "column": 16
+      }
+    },
+    "diff-text-hard": {
+      "start": {
+        "line": 34,
+        "column": 2
+      },
+      "end": {
+        "line": 34,
+        "column": 17
+      }
+    },
+    "back-btn": {
+      "start": {
+        "line": 35,
+        "column": 2
+      },
+      "end": {
+        "line": 35,
+        "column": 11
+      }
+    },
+    "back-text": {
+      "start": {
+        "line": 47,
+        "column": 2
+      },
+      "end": {
+        "line": 47,
+        "column": 12
+      }
+    },
+    "uid-1": {
+      "start": {
+        "line": 49,
+        "column": 0
+      },
+      "end": {
+        "line": 55,
+        "column": 6
+      }
+    },
+    "uid-2": {
+      "start": {
+        "line": 50,
+        "column": 2
+      },
+      "end": {
+        "line": 50,
+        "column": 44
+      }
+    },
+    "uid-3": {
+      "start": {
+        "line": 51,
+        "column": 2
+      },
+      "end": {
+        "line": 51,
+        "column": 89
+      }
+    },
+    "uid-4": {
+      "start": {
+        "line": 51,
+        "column": 43
+      },
+      "end": {
+        "line": 51,
+        "column": 83
+      }
+    },
+    "uid-5": {
+      "start": {
+        "line": 52,
+        "column": 2
+      },
+      "end": {
+        "line": 52,
+        "column": 94
+      }
+    },
+    "uid-6": {
+      "start": {
+        "line": 52,
+        "column": 47
+      },
+      "end": {
+        "line": 52,
+        "column": 88
+      }
+    },
+    "uid-7": {
+      "start": {
+        "line": 53,
+        "column": 2
+      },
+      "end": {
+        "line": 53,
+        "column": 89
+      }
+    },
+    "uid-8": {
+      "start": {
+        "line": 53,
+        "column": 43
+      },
+      "end": {
+        "line": 53,
+        "column": 83
+      }
+    },
+    "uid-9": {
+      "start": {
+        "line": 54,
+        "column": 2
+      },
+      "end": {
+        "line": 54,
+        "column": 84
+      }
+    },
+    "uid-10": {
+      "start": {
+        "line": 54,
+        "column": 43
+      },
+      "end": {
+        "line": 54,
+        "column": 78
+      }
+    }
+  }
+}
