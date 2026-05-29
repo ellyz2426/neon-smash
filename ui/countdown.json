@@ -1,0 +1,91 @@
+{
+  "element": {
+    "type": "container",
+    "sourceTag": "div",
+    "children": [
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "3"
+        ],
+        "properties": {
+          "id": "countdown-text",
+          "class": "cd-text"
+        },
+        "dataUid": "uid-2"
+      }
+    ],
+    "properties": {
+      "class": "cd-panel"
+    },
+    "dataUid": "uid-1"
+  },
+  "classes": {
+    "cd-panel": {
+      "content": {
+        "display": "flex",
+        "flexDirection": "column",
+        "alignItems": "center",
+        "justifyContent": "center",
+        "paddingTop": "2",
+        "paddingBottom": "2",
+        "paddingLeft": "3",
+        "paddingRight": "3",
+        "backgroundColor": "rgba(0, 0, 0, 0.8)",
+        "borderColor": "#ffff00",
+        "borderWidth": "0.12",
+        "borderRadius": 1.5
+      }
+    },
+    "cd-text": {
+      "content": {
+        "fontSize": "8",
+        "color": "#ffff00",
+        "fontWeight": "bold"
+      }
+    }
+  },
+  "ranges": {
+    "cd-panel": {
+      "start": {
+        "line": 1,
+        "column": 2
+      },
+      "end": {
+        "line": 1,
+        "column": 11
+      }
+    },
+    "cd-text": {
+      "start": {
+        "line": 15,
+        "column": 2
+      },
+      "end": {
+        "line": 15,
+        "column": 10
+      }
+    },
+    "uid-1": {
+      "start": {
+        "line": 21,
+        "column": 0
+      },
+      "end": {
+        "line": 23,
+        "column": 6
+      }
+    },
+    "uid-2": {
+      "start": {
+        "line": 22,
+        "column": 2
+      },
+      "end": {
+        "line": 22,
+        "column": 52
+      }
+    }
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "element": {
+    "type": "container",
+    "sourceTag": "div",
+    "children": [
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [],
+        "properties": {
+          "id": "combo-count",
+          "class": "combo-text"
+        },
+        "dataUid": "uid-2"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [],
+        "properties": {
+          "id": "combo-mult",
+          "class": "combo-mult"
+        },
+        "dataUid": "uid-3"
+      }
+    ],
+    "properties": {
+      "class": "combo-panel"
+    },
+    "dataUid": "uid-1"
+  },
+  "classes": {
+    "combo-panel": {
+      "content": {
+        "display": "flex",
+        "flexDirection": "column",
+        "alignItems": "center",
+        "padding": "1"
+      }
+    },
+    "combo-text": {
+      "content": {
+        "fontSize": "4",
+        "fontWeight": "bold",
+        "color": "#00ffff"
+      }
+    },
+    "combo-mult": {
+      "content": {
+        "fontSize": "2",
+        "color": "#ffff00",
+        "fontWeight": "bold"
+      }
+    }
+  },
+  "ranges": {
+    "combo-panel": {
+      "start": {
+        "line": 1,
+        "column": 2
+      },
+      "end": {
+        "line": 1,
+        "column": 14
+      }
+    },
+    "combo-text": {
+      "start": {
+        "line": 7,
+        "column": 2
+      },
+      "end": {
+        "line": 7,
+        "column": 13
+      }
+    },
+    "combo-mult": {
+      "start": {
+        "line": 12,
+        "column": 2
+      },
+      "end": {
+        "line": 12,
+        "column": 13
+      }
+    },
+    "uid-1": {
+      "start": {
+        "line": 18,
+        "column": 0
+      },
+      "end": {
+        "line": 21,
+        "column": 6
+      }
+    },
+    "uid-2": {
+      "start": {
+        "line": 19,
+        "column": 2
+      },
+      "end": {
+        "line": 19,
+        "column": 51
+      }
+    },
+    "uid-3": {
+      "start": {
+        "line": 20,
+        "column": 2
+      },
+      "end": {
+        "line": 20,
+        "column": 50
+      }
+    }
+  }
+}

@@ -1,0 +1,185 @@
+{
+  "element": {
+    "sourceTag": "panel",
+    "type": "custom",
+    "children": [
+      {
+        "sourceTag": "container",
+        "type": "custom",
+        "children": [
+          {
+            "sourceTag": "text",
+            "type": "custom",
+            "children": [
+              "LEVEL UP!"
+            ],
+            "properties": {
+              "id": "lvlup-title",
+              "fontsize": "24",
+              "fontweight": "bold",
+              "color": "#ffcc00"
+            },
+            "dataUid": "uid-3"
+          },
+          {
+            "sourceTag": "text",
+            "type": "custom",
+            "children": [
+              "LV.2"
+            ],
+            "properties": {
+              "id": "lvlup-level",
+              "fontsize": "32",
+              "fontweight": "bold",
+              "color": "#00ffff"
+            },
+            "dataUid": "uid-4"
+          },
+          {
+            "sourceTag": "text",
+            "type": "custom",
+            "children": [
+              "---"
+            ],
+            "properties": {
+              "id": "lvlup-reward-0",
+              "fontsize": "14",
+              "color": "#00ff88"
+            },
+            "dataUid": "uid-5"
+          },
+          {
+            "sourceTag": "text",
+            "type": "custom",
+            "children": [
+              "---"
+            ],
+            "properties": {
+              "id": "lvlup-reward-1",
+              "fontsize": "14",
+              "color": "#00ff88"
+            },
+            "dataUid": "uid-6"
+          },
+          {
+            "sourceTag": "text",
+            "type": "custom",
+            "children": [
+              "---"
+            ],
+            "properties": {
+              "id": "lvlup-reward-2",
+              "fontsize": "14",
+              "color": "#00ff88"
+            },
+            "dataUid": "uid-7"
+          },
+          {
+            "sourceTag": "text",
+            "type": "custom",
+            "children": [
+              "+100 XP"
+            ],
+            "properties": {
+              "id": "lvlup-xp",
+              "fontsize": "12",
+              "color": "#aaaaaa"
+            },
+            "dataUid": "uid-8"
+          }
+        ],
+        "properties": {
+          "direction": "column",
+          "align": "center",
+          "padding": "16"
+        },
+        "dataUid": "uid-2"
+      }
+    ],
+    "properties": {},
+    "dataUid": "uid-1"
+  },
+  "classes": {},
+  "ranges": {
+    "uid-1": {
+      "start": {
+        "line": 0,
+        "column": 0
+      },
+      "end": {
+        "line": 9,
+        "column": 8
+      }
+    },
+    "uid-2": {
+      "start": {
+        "line": 1,
+        "column": 2
+      },
+      "end": {
+        "line": 8,
+        "column": 14
+      }
+    },
+    "uid-3": {
+      "start": {
+        "line": 2,
+        "column": 4
+      },
+      "end": {
+        "line": 2,
+        "column": 91
+      }
+    },
+    "uid-4": {
+      "start": {
+        "line": 3,
+        "column": 4
+      },
+      "end": {
+        "line": 3,
+        "column": 86
+      }
+    },
+    "uid-5": {
+      "start": {
+        "line": 4,
+        "column": 4
+      },
+      "end": {
+        "line": 4,
+        "column": 70
+      }
+    },
+    "uid-6": {
+      "start": {
+        "line": 5,
+        "column": 4
+      },
+      "end": {
+        "line": 5,
+        "column": 70
+      }
+    },
+    "uid-7": {
+      "start": {
+        "line": 6,
+        "column": 4
+      },
+      "end": {
+        "line": 6,
+        "column": 70
+      }
+    },
+    "uid-8": {
+      "start": {
+        "line": 7,
+        "column": 4
+      },
+      "end": {
+        "line": 7,
+        "column": 68
+      }
+    }
+  }
+}

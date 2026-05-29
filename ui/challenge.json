@@ -1,0 +1,515 @@
+{
+  "element": {
+    "type": "container",
+    "sourceTag": "div",
+    "children": [
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "DAILY CHALLENGE"
+        ],
+        "properties": {
+          "class": "challenge-header"
+        },
+        "dataUid": "uid-2"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Speed Demon"
+        ],
+        "properties": {
+          "id": "ch-title",
+          "class": "challenge-title"
+        },
+        "dataUid": "uid-3"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Targets expire 40% faster"
+        ],
+        "properties": {
+          "id": "ch-desc",
+          "class": "challenge-desc"
+        },
+        "dataUid": "uid-4"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Mode: Classic | Hard"
+        ],
+        "properties": {
+          "id": "ch-detail",
+          "class": "challenge-detail"
+        },
+        "dataUid": "uid-5"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Target: 15,000 pts"
+        ],
+        "properties": {
+          "id": "ch-target",
+          "class": "challenge-target"
+        },
+        "dataUid": "uid-6"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Streak: 0 days"
+        ],
+        "properties": {
+          "id": "ch-streak",
+          "class": "challenge-streak"
+        },
+        "dataUid": "uid-7"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [],
+        "properties": {
+          "id": "ch-status",
+          "class": "challenge-status"
+        },
+        "dataUid": "uid-8"
+      },
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "type": "container",
+            "sourceTag": "div",
+            "children": [
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "ACCEPT"
+                ],
+                "properties": {
+                  "class": "challenge-btn-text"
+                },
+                "dataUid": "uid-11"
+              }
+            ],
+            "properties": {
+              "id": "btn-start-challenge",
+              "class": "challenge-btn",
+              "cursor": "pointer"
+            },
+            "dataUid": "uid-10"
+          },
+          {
+            "type": "container",
+            "sourceTag": "div",
+            "children": [
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "BACK"
+                ],
+                "properties": {
+                  "class": "back-btn-text"
+                },
+                "dataUid": "uid-13"
+              }
+            ],
+            "properties": {
+              "id": "btn-back-challenge",
+              "class": "back-btn",
+              "cursor": "pointer"
+            },
+            "dataUid": "uid-12"
+          }
+        ],
+        "properties": {
+          "class": "btn-row"
+        },
+        "dataUid": "uid-9"
+      }
+    ],
+    "properties": {
+      "class": "challenge-panel"
+    },
+    "dataUid": "uid-1"
+  },
+  "classes": {
+    "challenge-panel": {
+      "content": {
+        "display": "flex",
+        "flexDirection": "column",
+        "padding": "2",
+        "backgroundColor": "rgba(0, 0, 0, 0.9)",
+        "borderColor": "#ffaa00",
+        "borderWidth": "0.15",
+        "borderRadius": 1,
+        "gap": "0.8",
+        "alignItems": "center"
+      }
+    },
+    "challenge-header": {
+      "content": {
+        "fontSize": "3",
+        "color": "#ffaa00",
+        "fontWeight": "bold"
+      }
+    },
+    "challenge-title": {
+      "content": {
+        "fontSize": "2.4",
+        "color": "#ffffff",
+        "fontWeight": "bold"
+      }
+    },
+    "challenge-desc": {
+      "content": {
+        "fontSize": "1.4",
+        "color": "#cccccc"
+      }
+    },
+    "challenge-detail": {
+      "content": {
+        "fontSize": "1.3",
+        "color": "#aaaaaa"
+      }
+    },
+    "challenge-target": {
+      "content": {
+        "fontSize": "1.6",
+        "color": "#ffdd44",
+        "fontWeight": "bold"
+      }
+    },
+    "challenge-streak": {
+      "content": {
+        "fontSize": "1.2",
+        "color": "#ff8844"
+      }
+    },
+    "challenge-status": {
+      "content": {
+        "fontSize": "1.4",
+        "color": "#44ff88",
+        "fontWeight": "bold"
+      }
+    },
+    "btn-row": {
+      "content": {
+        "display": "flex",
+        "flexDirection": "row",
+        "gap": "1",
+        "marginTop": "0.5"
+      }
+    },
+    "challenge-btn": {
+      "content": {
+        "paddingX": "2",
+        "paddingY": "0.8",
+        "backgroundColor": "rgba(255, 170, 0, 0.3)",
+        "borderColor": "#ffaa00",
+        "borderWidth": "0.1",
+        "borderRadius": 0.5,
+        "cursor": "pointer"
+      }
+    },
+    "challenge-btn-text": {
+      "content": {
+        "fontSize": "1.4",
+        "color": "#ffaa00",
+        "fontWeight": "bold"
+      }
+    },
+    "back-btn": {
+      "content": {
+        "paddingX": "2",
+        "paddingY": "0.8",
+        "backgroundColor": "rgba(128, 128, 128, 0.3)",
+        "borderColor": "#888888",
+        "borderWidth": "0.1",
+        "borderRadius": 0.5,
+        "cursor": "pointer"
+      }
+    },
+    "back-btn-text": {
+      "content": {
+        "fontSize": "1.3",
+        "color": "#aaaaaa"
+      }
+    }
+  },
+  "ranges": {
+    "challenge-panel": {
+      "start": {
+        "line": 2,
+        "column": 2
+      },
+      "end": {
+        "line": 2,
+        "column": 18
+      }
+    },
+    "challenge-header": {
+      "start": {
+        "line": 13,
+        "column": 2
+      },
+      "end": {
+        "line": 13,
+        "column": 19
+      }
+    },
+    "challenge-title": {
+      "start": {
+        "line": 18,
+        "column": 2
+      },
+      "end": {
+        "line": 18,
+        "column": 18
+      }
+    },
+    "challenge-desc": {
+      "start": {
+        "line": 23,
+        "column": 2
+      },
+      "end": {
+        "line": 23,
+        "column": 17
+      }
+    },
+    "challenge-detail": {
+      "start": {
+        "line": 27,
+        "column": 2
+      },
+      "end": {
+        "line": 27,
+        "column": 19
+      }
+    },
+    "challenge-target": {
+      "start": {
+        "line": 31,
+        "column": 2
+      },
+      "end": {
+        "line": 31,
+        "column": 19
+      }
+    },
+    "challenge-streak": {
+      "start": {
+        "line": 36,
+        "column": 2
+      },
+      "end": {
+        "line": 36,
+        "column": 19
+      }
+    },
+    "challenge-status": {
+      "start": {
+        "line": 40,
+        "column": 2
+      },
+      "end": {
+        "line": 40,
+        "column": 19
+      }
+    },
+    "btn-row": {
+      "start": {
+        "line": 45,
+        "column": 2
+      },
+      "end": {
+        "line": 45,
+        "column": 10
+      }
+    },
+    "challenge-btn": {
+      "start": {
+        "line": 51,
+        "column": 2
+      },
+      "end": {
+        "line": 51,
+        "column": 16
+      }
+    },
+    "challenge-btn-text": {
+      "start": {
+        "line": 60,
+        "column": 2
+      },
+      "end": {
+        "line": 60,
+        "column": 21
+      }
+    },
+    "back-btn": {
+      "start": {
+        "line": 65,
+        "column": 2
+      },
+      "end": {
+        "line": 65,
+        "column": 11
+      }
+    },
+    "back-btn-text": {
+      "start": {
+        "line": 74,
+        "column": 2
+      },
+      "end": {
+        "line": 74,
+        "column": 16
+      }
+    },
+    "uid-1": {
+      "start": {
+        "line": 79,
+        "column": 0
+      },
+      "end": {
+        "line": 95,
+        "column": 6
+      }
+    },
+    "uid-2": {
+      "start": {
+        "line": 80,
+        "column": 2
+      },
+      "end": {
+        "line": 80,
+        "column": 55
+      }
+    },
+    "uid-3": {
+      "start": {
+        "line": 81,
+        "column": 2
+      },
+      "end": {
+        "line": 81,
+        "column": 64
+      }
+    },
+    "uid-4": {
+      "start": {
+        "line": 82,
+        "column": 2
+      },
+      "end": {
+        "line": 82,
+        "column": 76
+      }
+    },
+    "uid-5": {
+      "start": {
+        "line": 83,
+        "column": 2
+      },
+      "end": {
+        "line": 83,
+        "column": 75
+      }
+    },
+    "uid-6": {
+      "start": {
+        "line": 84,
+        "column": 2
+      },
+      "end": {
+        "line": 84,
+        "column": 73
+      }
+    },
+    "uid-7": {
+      "start": {
+        "line": 85,
+        "column": 2
+      },
+      "end": {
+        "line": 85,
+        "column": 69
+      }
+    },
+    "uid-8": {
+      "start": {
+        "line": 86,
+        "column": 2
+      },
+      "end": {
+        "line": 86,
+        "column": 55
+      }
+    },
+    "uid-9": {
+      "start": {
+        "line": 87,
+        "column": 2
+      },
+      "end": {
+        "line": 94,
+        "column": 8
+      }
+    },
+    "uid-10": {
+      "start": {
+        "line": 88,
+        "column": 4
+      },
+      "end": {
+        "line": 90,
+        "column": 10
+      }
+    },
+    "uid-11": {
+      "start": {
+        "line": 89,
+        "column": 6
+      },
+      "end": {
+        "line": 89,
+        "column": 52
+      }
+    },
+    "uid-12": {
+      "start": {
+        "line": 91,
+        "column": 4
+      },
+      "end": {
+        "line": 93,
+        "column": 10
+      }
+    },
+    "uid-13": {
+      "start": {
+        "line": 92,
+        "column": 6
+      },
+      "end": {
+        "line": 92,
+        "column": 45
+      }
+    }
+  }
+}

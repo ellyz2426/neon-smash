@@ -1,0 +1,605 @@
+{
+  "element": {
+    "type": "container",
+    "sourceTag": "div",
+    "children": [
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "HOW TO PLAY"
+        ],
+        "properties": {
+          "class": "help-title"
+        },
+        "dataUid": "uid-2"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Browser Controls"
+        ],
+        "properties": {
+          "class": "help-section"
+        },
+        "dataUid": "uid-3"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Mouse: Aim at targets"
+        ],
+        "properties": {
+          "class": "help-text"
+        },
+        "dataUid": "uid-4"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Click: Strike target"
+        ],
+        "properties": {
+          "class": "help-text"
+        },
+        "dataUid": "uid-5"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "ESC: Pause / Resume"
+        ],
+        "properties": {
+          "class": "help-text"
+        },
+        "dataUid": "uid-6"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "VR Controls"
+        ],
+        "properties": {
+          "class": "help-section"
+        },
+        "dataUid": "uid-7"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Trigger: Strike target"
+        ],
+        "properties": {
+          "class": "help-text"
+        },
+        "dataUid": "uid-8"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Laser Pointer: Aim at targets"
+        ],
+        "properties": {
+          "class": "help-text"
+        },
+        "dataUid": "uid-9"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "B Button: Pause"
+        ],
+        "properties": {
+          "class": "help-text"
+        },
+        "dataUid": "uid-10"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "A Button: Confirm"
+        ],
+        "properties": {
+          "class": "help-text"
+        },
+        "dataUid": "uid-11"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Target Types"
+        ],
+        "properties": {
+          "class": "help-section"
+        },
+        "dataUid": "uid-12"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Cyan: Normal (100 pts)"
+        ],
+        "properties": {
+          "class": "help-text"
+        },
+        "dataUid": "uid-13"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Yellow: Speed (200 pts, brief)"
+        ],
+        "properties": {
+          "class": "help-text"
+        },
+        "dataUid": "uid-14"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Orange: Armored (300 pts, 2 hits)"
+        ],
+        "properties": {
+          "class": "help-text"
+        },
+        "dataUid": "uid-15"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Red: BOMB (avoid! -500 pts)"
+        ],
+        "properties": {
+          "class": "help-text"
+        },
+        "dataUid": "uid-16"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Gold: Golden (500 pts, rare)"
+        ],
+        "properties": {
+          "class": "help-text"
+        },
+        "dataUid": "uid-17"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Green: Chain (350 pts, sequence)"
+        ],
+        "properties": {
+          "class": "help-text"
+        },
+        "dataUid": "uid-18"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Combos"
+        ],
+        "properties": {
+          "class": "help-section"
+        },
+        "dataUid": "uid-19"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Hit consecutively for multipliers"
+        ],
+        "properties": {
+          "class": "help-text"
+        },
+        "dataUid": "uid-20"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "5+ hits: 2x | 10+: 3x | 15+: 5x | 25+: 10x"
+        ],
+        "properties": {
+          "class": "help-text"
+        },
+        "dataUid": "uid-21"
+      },
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "BACK"
+            ],
+            "properties": {
+              "class": "back-text"
+            },
+            "dataUid": "uid-23"
+          }
+        ],
+        "properties": {
+          "id": "btn-back-help",
+          "class": "back-btn"
+        },
+        "dataUid": "uid-22"
+      }
+    ],
+    "properties": {
+      "class": "help-panel"
+    },
+    "dataUid": "uid-1"
+  },
+  "classes": {
+    "help-panel": {
+      "content": {
+        "display": "flex",
+        "flexDirection": "column",
+        "paddingTop": "2",
+        "paddingBottom": "2",
+        "paddingLeft": "2",
+        "paddingRight": "2",
+        "backgroundColor": "rgba(0, 0, 0, 0.9)",
+        "borderColor": "#00ffff",
+        "borderWidth": "0.12",
+        "borderRadius": 1.5
+      }
+    },
+    "help-title": {
+      "content": {
+        "fontSize": "3",
+        "color": "#00ffff",
+        "fontWeight": "bold"
+      }
+    },
+    "help-section": {
+      "content": {
+        "fontSize": "1.8",
+        "color": "#ffff00",
+        "fontWeight": "bold",
+        "marginTop": "1.2"
+      }
+    },
+    "help-text": {
+      "content": {
+        "fontSize": "1.2",
+        "color": "#aaaaaa",
+        "marginTop": "0.3"
+      }
+    },
+    "back-btn": {
+      "content": {
+        "marginTop": "1.5",
+        "paddingTop": "0.5",
+        "paddingBottom": "0.5",
+        "paddingLeft": "2",
+        "paddingRight": "2",
+        "backgroundColor": "rgba(255, 100, 100, 0.1)",
+        "borderColor": "#ff6666",
+        "borderWidth": "0.06",
+        "borderRadius": 0.5,
+        "cursor": "pointer",
+        "alignSelf": "center"
+      }
+    },
+    "back-text": {
+      "content": {
+        "fontSize": "1.4",
+        "color": "#ff6666"
+      }
+    }
+  },
+  "ranges": {
+    "help-panel": {
+      "start": {
+        "line": 1,
+        "column": 2
+      },
+      "end": {
+        "line": 1,
+        "column": 13
+      }
+    },
+    "help-title": {
+      "start": {
+        "line": 13,
+        "column": 2
+      },
+      "end": {
+        "line": 13,
+        "column": 13
+      }
+    },
+    "help-section": {
+      "start": {
+        "line": 18,
+        "column": 2
+      },
+      "end": {
+        "line": 18,
+        "column": 15
+      }
+    },
+    "help-text": {
+      "start": {
+        "line": 24,
+        "column": 2
+      },
+      "end": {
+        "line": 24,
+        "column": 12
+      }
+    },
+    "back-btn": {
+      "start": {
+        "line": 29,
+        "column": 2
+      },
+      "end": {
+        "line": 29,
+        "column": 11
+      }
+    },
+    "back-text": {
+      "start": {
+        "line": 42,
+        "column": 2
+      },
+      "end": {
+        "line": 42,
+        "column": 12
+      }
+    },
+    "uid-1": {
+      "start": {
+        "line": 44,
+        "column": 0
+      },
+      "end": {
+        "line": 66,
+        "column": 6
+      }
+    },
+    "uid-2": {
+      "start": {
+        "line": 45,
+        "column": 2
+      },
+      "end": {
+        "line": 45,
+        "column": 45
+      }
+    },
+    "uid-3": {
+      "start": {
+        "line": 46,
+        "column": 2
+      },
+      "end": {
+        "line": 46,
+        "column": 52
+      }
+    },
+    "uid-4": {
+      "start": {
+        "line": 47,
+        "column": 2
+      },
+      "end": {
+        "line": 47,
+        "column": 54
+      }
+    },
+    "uid-5": {
+      "start": {
+        "line": 48,
+        "column": 2
+      },
+      "end": {
+        "line": 48,
+        "column": 53
+      }
+    },
+    "uid-6": {
+      "start": {
+        "line": 49,
+        "column": 2
+      },
+      "end": {
+        "line": 49,
+        "column": 52
+      }
+    },
+    "uid-7": {
+      "start": {
+        "line": 50,
+        "column": 2
+      },
+      "end": {
+        "line": 50,
+        "column": 47
+      }
+    },
+    "uid-8": {
+      "start": {
+        "line": 51,
+        "column": 2
+      },
+      "end": {
+        "line": 51,
+        "column": 55
+      }
+    },
+    "uid-9": {
+      "start": {
+        "line": 52,
+        "column": 2
+      },
+      "end": {
+        "line": 52,
+        "column": 62
+      }
+    },
+    "uid-10": {
+      "start": {
+        "line": 53,
+        "column": 2
+      },
+      "end": {
+        "line": 53,
+        "column": 48
+      }
+    },
+    "uid-11": {
+      "start": {
+        "line": 54,
+        "column": 2
+      },
+      "end": {
+        "line": 54,
+        "column": 50
+      }
+    },
+    "uid-12": {
+      "start": {
+        "line": 55,
+        "column": 2
+      },
+      "end": {
+        "line": 55,
+        "column": 48
+      }
+    },
+    "uid-13": {
+      "start": {
+        "line": 56,
+        "column": 2
+      },
+      "end": {
+        "line": 56,
+        "column": 55
+      }
+    },
+    "uid-14": {
+      "start": {
+        "line": 57,
+        "column": 2
+      },
+      "end": {
+        "line": 57,
+        "column": 63
+      }
+    },
+    "uid-15": {
+      "start": {
+        "line": 58,
+        "column": 2
+      },
+      "end": {
+        "line": 58,
+        "column": 66
+      }
+    },
+    "uid-16": {
+      "start": {
+        "line": 59,
+        "column": 2
+      },
+      "end": {
+        "line": 59,
+        "column": 60
+      }
+    },
+    "uid-17": {
+      "start": {
+        "line": 60,
+        "column": 2
+      },
+      "end": {
+        "line": 60,
+        "column": 61
+      }
+    },
+    "uid-18": {
+      "start": {
+        "line": 61,
+        "column": 2
+      },
+      "end": {
+        "line": 61,
+        "column": 65
+      }
+    },
+    "uid-19": {
+      "start": {
+        "line": 62,
+        "column": 2
+      },
+      "end": {
+        "line": 62,
+        "column": 42
+      }
+    },
+    "uid-20": {
+      "start": {
+        "line": 63,
+        "column": 2
+      },
+      "end": {
+        "line": 63,
+        "column": 66
+      }
+    },
+    "uid-21": {
+      "start": {
+        "line": 64,
+        "column": 2
+      },
+      "end": {
+        "line": 64,
+        "column": 75
+      }
+    },
+    "uid-22": {
+      "start": {
+        "line": 65,
+        "column": 2
+      },
+      "end": {
+        "line": 65,
+        "column": 84
+      }
+    },
+    "uid-23": {
+      "start": {
+        "line": 65,
+        "column": 43
+      },
+      "end": {
+        "line": 65,
+        "column": 78
+      }
+    }
+  }
+}
