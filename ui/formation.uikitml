@@ -1,0 +1,9 @@
+<panel>
+  <container direction="column" align="center" padding="16">
+    <text id="form-title" fontSize="22" fontWeight="bold" color="#ffcc00">FORMATION!</text>
+    <text id="form-name" fontSize="18" color="#ffffff">CROSS</text>
+    <text id="form-desc" fontSize="13" color="#aaaaaa">Clear all targets for bonus points!</text>
+    <text id="form-bonus" fontSize="16" fontWeight="bold" color="#00ff88">+500 BONUS</text>
+    <text id="form-remaining" fontSize="14" color="#cccccc">5 targets remaining</text>
+  </container>
+</panel>

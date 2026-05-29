@@ -1,4 +1,4 @@
-// Neon Smash VR — Main Entry Point (Round 4: moving targets, haptics, match history, streak)
+// Neon Smash VR — Main Entry Point (Round 5: XP progression, zen mode, wave formations, 40 achievements)
 import {
   World, PanelUI, Follower, FollowBehavior, ScreenSpace,
   PanelDocument, Vector3, Raycaster, Vector2,
@@ -29,6 +29,14 @@ import {
   addMatchRecord, loadMatchHistory, formatMatchSummary, formatMatchDetail,
   formatMatchDate,
 } from './history';
+import {
+  loadProfile, saveProfile, addXP, calculateSessionXP,
+  xpForLevel, xpProgress, formatLevel, formatXPBar,
+  LEVEL_REWARDS, PLAYER_TITLES, PlayerProfile, LevelReward,
+} from './progression';
+import {
+  pickFormation, shouldSpawnFormation, ActiveFormation, Formation, FORMATIONS,
+} from './formations';
 
 // === Globals ===
 let world: World;
@@ -50,6 +58,16 @@ let currentSkin: StrikerSkin = StrikerSkin.Neon;
 let currentChallenge: DailyChallenge | null = null;
 let challengeConfig: ChallengeGameConfig | null = null;
 let isPlayingChallenge = false;
+
+// Progression state
+let profile: PlayerProfile = loadProfile();
+let pendingLevelUps: LevelReward[] = [];
+let levelUpTimer = 0;
+let sessionFormationsCleared = 0;
+
+// Formation state
+let activeFormation: ActiveFormation | null = null;
+let formationCooldown = 0;
 
 // Tutorial state
 let tutorialStep = 0;
@@ -206,6 +224,10 @@ function setupUI() {
     // Round 4 panels
     { id: 'history', config: '/ui/history.json', maxW: 0.85, maxH: 0.9, mode: 'world' },
     { id: 'streak', config: '/ui/streak.json', maxW: 0.2, maxH: 0.06, mode: 'follower' },
+    // Round 5 panels
+    { id: 'profile', config: '/ui/profile.json', maxW: 0.85, maxH: 1.0, mode: 'world' },
+    { id: 'formation', config: '/ui/formation.json', maxW: 0.4, maxH: 0.2, mode: 'follower' },
+    { id: 'levelup', config: '/ui/levelup.json', maxW: 0.4, maxH: 0.25, mode: 'follower' },
   ];
 
   panels.forEach(p => {
@@ -224,6 +246,8 @@ function setupUI() {
         case 'toast': offY = -0.12; break;
         case 'powerup': offY = 0.16; offX = -0.18; break;
         case 'streak': offY = -0.04; offX = 0.22; break;
+        case 'formation': offY = -0.14; break;
+        case 'levelup': offY = 0.08; break;
       }
       entity.addComponent(Follower, {
         target: world.player.head,
@@ -287,6 +311,7 @@ function bindUIEvents() {
   bindBtn(titleDoc, 'btn-challenge', () => { audio.playButtonClick(); populateChallenge(); changeState('challenge'); });
   bindBtn(titleDoc, 'btn-tutorial', () => { audio.playButtonClick(); tutorialStep = 0; populateTutorial(); changeState('tutorial'); });
   bindBtn(titleDoc, 'btn-history', () => { audio.playButtonClick(); populateHistory(); changeState('history'); });
+  bindBtn(titleDoc, 'btn-profile', () => { audio.playButtonClick(); populateProfile(); changeState('profile'); });
 
   // Mode select
   const modeDoc = getDoc('modeselect');
@@ -296,6 +321,7 @@ function bindUIEvents() {
     bindBtn(modeDoc, 'btn-precision', () => { audio.playButtonClick(); gsm.mode = GameMode.Precision; changeState('difficulty'); });
     bindBtn(modeDoc, 'btn-endless', () => { audio.playButtonClick(); gsm.mode = GameMode.Endless; changeState('difficulty'); });
     bindBtn(modeDoc, 'btn-bosswave', () => { audio.playButtonClick(); gsm.mode = GameMode.BossWave; changeState('difficulty'); });
+    bindBtn(modeDoc, 'btn-zen', () => { audio.playButtonClick(); gsm.mode = GameMode.Zen; startGame(Difficulty.Easy); }); // Zen skips difficulty
     bindBtn(modeDoc, 'btn-back-mode', () => { audio.playButtonClick(); changeState('title'); });
   }
 
@@ -323,7 +349,7 @@ function bindUIEvents() {
   }
 
   // Back buttons
-  ['leaderboard', 'achievements', 'settings', 'help', 'stats', 'skins', 'history'].forEach(id => {
+  ['leaderboard', 'achievements', 'settings', 'help', 'stats', 'skins', 'history', 'profile'].forEach(id => {
     const doc = getDoc(id);
     if (doc) bindBtn(doc, `btn-back-${id}`, () => { audio.playButtonClick(); changeState('title'); });
   });
@@ -409,6 +435,15 @@ function changeState(newState: GameState) {
       targetSystem.removeBoss(world.scene);
       powerups.clearAll(world.scene);
       isPlayingChallenge = false;
+      // Show player level/title on title screen
+      profile = loadProfile();
+      {
+        const titleDoc = getDoc('title');
+        if (titleDoc) {
+          const titleName = PLAYER_TITLES[profile.currentTitle] || 'Rookie';
+          setText(titleDoc, 'title-player-info', `${formatLevel(profile)} — ${titleName}`);
+        }
+      }
       break;
     case 'modeselect':
       showUI('modeselect');
@@ -461,6 +496,9 @@ function changeState(newState: GameState) {
     case 'history':
       showUI('history');
       break;
+    case 'profile':
+      showUI('profile');
+      break;
   }
 }
 
@@ -478,6 +516,9 @@ function startGame(diff: Difficulty) {
   leftHandUsed = false;
   rightHandUsed = false;
   lastPowerUpWarning = 0;
+  activeFormation = null;
+  formationCooldown = 0;
+  sessionFormationsCleared = 0;
   audio.startMusic();
   targetSystem.startWave(gsm.wave, gsm.mode);
   showWaveAnnouncement(gsm.wave);
@@ -643,6 +684,16 @@ function updatePlaying(dt: number, t: number) {
   const spawnEnabled = !waveTransition && !(gsm.mode === GameMode.BossWave && targetSystem.bossGroup);
   targetSystem.update(scaledDt, gsm.difficulty, gsm.mode, gsm.wave, pylonPositions, world.scene, spawnEnabled);
 
+  // Handle expired targets — show "poof" effect (Zen mode: no miss penalty)
+  for (const expired of targetSystem.expiredThisFrame) {
+    if (expired.config.type !== 'bomb') {
+      particles.burst(expired.pos.setY(expired.pos.y + 0.3), 0x555577, 6, 2, 0.3);
+      if (gsm.mode !== GameMode.Zen) {
+        gsm.addMiss();
+      }
+    }
+  }
+
   // Update power-ups
   powerups.update(scaledDt, gsm.wave, pylonPositions, world.scene, spawnEnabled && state === 'playing');
 
@@ -668,6 +719,10 @@ function updatePlaying(dt: number, t: number) {
     } else if (gsm.mode === GameMode.Precision) {
       gameOver(true);
       return;
+    } else if (gsm.mode === GameMode.Zen) {
+      // Zen: just keep going, no pressure
+      gsm.startNextWave();
+      targetSystem.startWave(gsm.wave, gsm.mode);
     } else {
       gsm.recordWaveComplete();
       const wasPerfect = gsm.waveHits === gsm.waveTargets && gsm.waveTargets > 0 && gsm.waveBombsHit === 0;
@@ -707,6 +762,49 @@ function updatePlaying(dt: number, t: number) {
       targetSystem.startWave(gsm.wave, gsm.mode);
       showWaveAnnouncement(gsm.wave);
       audio.playWaveStart(gsm.wave);
+
+      // Check if we should spawn a formation at wave start
+      if (gsm.mode !== GameMode.Zen && shouldSpawnFormation(gsm.wave) && formationCooldown <= 0) {
+        spawnFormation(gsm.wave);
+      }
+    }
+  }
+
+  // Formation tracking
+  if (activeFormation) {
+    // Check if formation targets were destroyed
+    for (const pylonIdx of [...activeFormation.targetsRemaining]) {
+      const stillAlive = targetSystem.targets.some(t => t.alive && t.pylonIndex === pylonIdx);
+      if (!stillAlive) {
+        activeFormation.targetsRemaining.delete(pylonIdx);
+      }
+    }
+
+    // Update formation HUD
+    updateFormationDisplay();
+
+    if (activeFormation.targetsRemaining.size === 0) {
+      // Formation cleared! Award bonus
+      const bonus = activeFormation.formation.bonusPoints;
+      gsm.score += bonus;
+      sessionFormationsCleared++;
+      audio.playAchievement();
+      showToast(`FORMATION CLEAR! +${bonus}`);
+      particles.ring(new Vector3(0, 1.6, -2), 0xffcc00, 15, 1.0);
+      activeFormation = null;
+      formationCooldown = 15; // cooldown before next formation
+      if (uiEntities['formation']) uiEntities['formation'].object3D!.visible = false;
+    }
+  }
+
+  // Formation cooldown
+  if (formationCooldown > 0) formationCooldown -= dt;
+
+  // Level up display timer
+  if (levelUpTimer > 0) {
+    levelUpTimer -= dt;
+    if (levelUpTimer <= 0) {
+      if (uiEntities['levelup']) uiEntities['levelup'].object3D!.visible = false;
     }
   }
 
@@ -719,6 +817,8 @@ function gameOver(completed: boolean) {
   targetSystem.removeBoss(world.scene);
   powerups.clearAll(world.scene);
   arena.setComboLevel(0);
+  activeFormation = null;
+  if (uiEntities['formation']) uiEntities['formation'].object3D!.visible = false;
 
   if (completed) {
     audio.playWinFanfare();
@@ -761,6 +861,40 @@ function gameOver(completed: boolean) {
     bombsHit: gsm.bombsHit, perfectWaves: gsm.perfectWaves,
     completed, isChallenge: isPlayingChallenge,
   });
+
+  // XP Progression
+  const xpResult = calculateSessionXP({
+    score: gsm.score, hits: gsm.hits, maxCombo: gsm.maxCombo,
+    accuracy: gsm.getAccuracy(), perfectWaves: gsm.perfectWaves,
+    completed, isChallenge: isPlayingChallenge, waveReached: gsm.wave,
+  });
+  lastSessionXP = xpResult.total;
+  const oldLevel = profile.level;
+  const rewards = addXP(profile, xpResult.total);
+  pendingLevelUps = rewards;
+
+  // Show level up notification
+  if (profile.level > oldLevel) {
+    showLevelUp(profile.level, xpResult.total, rewards);
+  }
+
+  // Check XP achievements
+  if (profile.xp >= 1000) tryAchievement('xp_1000');
+  if (profile.xp >= 10000) tryAchievement('xp_10000');
+  if (profile.level >= 5) tryAchievement('level_5');
+  if (profile.level >= 10) tryAchievement('level_10');
+  if (profile.level >= 25) tryAchievement('level_25');
+  if (profile.level >= 50) tryAchievement('level_50');
+
+  // Zen mode achievements
+  if (gsm.mode === GameMode.Zen) {
+    if (gsm.timeElapsed >= 300) tryAchievement('zen_5m');
+    if (gsm.timeElapsed >= 900) tryAchievement('zen_15m');
+  }
+
+  // Formation achievements
+  if (sessionFormationsCleared >= 1) tryAchievement('formation_first');
+  if (sessionFormationsCleared >= 10) tryAchievement('formation_10');
 
   changeState('gameover');
 }
@@ -1091,6 +1225,9 @@ function showToast(msg: string) {
 }
 
 // === Populate Panels ===
+// Track last session XP for game-over display
+let lastSessionXP = 0;
+
 function populateGameOver() {
   const doc = getDoc('gameover');
   if (!doc) return;
@@ -1104,11 +1241,15 @@ function populateGameOver() {
     }
   }
   setText(doc, 'go-title', title);
-  setText(doc, 'go-score', `Score: ${gsm.score}`);
+  setText(doc, 'go-score', `Score: ${gsm.score.toLocaleString()}`);
+  setText(doc, 'go-xp', lastSessionXP > 0 ? `+${lastSessionXP} XP` : '');
+  setText(doc, 'go-level', `${formatLevel(profile)} ${PLAYER_TITLES[profile.currentTitle] || ''}`);
   setText(doc, 'go-hits', `Hits: ${gsm.hits}`);
   setText(doc, 'go-accuracy', `Accuracy: ${gsm.getAccuracy()}%`);
   setText(doc, 'go-combo', `Max Combo: ${gsm.maxCombo}x`);
   setText(doc, 'go-mode', `Mode: ${MODE_NAMES[gsm.mode]}`);
+  setText(doc, 'go-wave', gsm.mode !== GameMode.SpeedRush && gsm.mode !== GameMode.Precision
+    ? `Wave: ${gsm.wave}` : '');
 }
 
 function populateLeaderboard() {
@@ -1281,6 +1422,115 @@ function updateStreakDisplay() {
     }
   } else {
     if (uiEntities['streak']) uiEntities['streak'].object3D!.visible = false;
+  }
+}
+
+// === Profile ===
+function populateProfile() {
+  const doc = getDoc('profile');
+  if (!doc) return;
+  profile = loadProfile(); // refresh
+
+  setText(doc, 'prof-name', 'PLAYER');
+  setText(doc, 'prof-title-label', PLAYER_TITLES[profile.currentTitle] || 'Rookie');
+  setText(doc, 'prof-level', formatLevel(profile));
+  setText(doc, 'prof-xp-bar', formatXPBar(profile));
+
+  const currentLevelXP = xpForLevel(profile.level);
+  const nextLevelXP = xpForLevel(profile.level + 1);
+  setText(doc, 'prof-xp-text', `${profile.xp - currentLevelXP} / ${nextLevelXP - currentLevelXP} XP`);
+
+  setText(doc, 'prof-skins', `Skins: ${profile.skinsUnlocked.length}/5`);
+  setText(doc, 'prof-themes', `Arenas: ${profile.themesUnlocked.length}/8`);
+  setText(doc, 'prof-titles', `Titles: ${profile.titlesUnlocked.length}/7`);
+
+  // Next rewards
+  const upcoming = LEVEL_REWARDS.filter(r => r.level > profile.level).slice(0, 3);
+  for (let i = 0; i < 3; i++) {
+    if (upcoming[i]) {
+      setText(doc, `prof-next-${i}`, `LV.${upcoming[i].level}: ${upcoming[i].name} (${upcoming[i].type})`);
+    } else {
+      setText(doc, `prof-next-${i}`, '---');
+    }
+  }
+
+  // Title selector
+  for (let i = 0; i < 4; i++) {
+    const t = profile.titlesUnlocked[i];
+    if (t) {
+      const display = PLAYER_TITLES[t] || t;
+      setText(doc, `prof-t-${i}`, t === profile.currentTitle ? `> ${display} <` : display);
+    } else {
+      setText(doc, `prof-t-${i}`, '---');
+    }
+  }
+
+  // Bind title nav buttons
+  bindBtn(doc, 'btn-title-prev', () => {
+    const idx = profile.titlesUnlocked.indexOf(profile.currentTitle);
+    const newIdx = (idx - 1 + profile.titlesUnlocked.length) % profile.titlesUnlocked.length;
+    profile.currentTitle = profile.titlesUnlocked[newIdx];
+    saveProfile(profile);
+    audio.playButtonClick();
+    populateProfile();
+  });
+  bindBtn(doc, 'btn-title-next', () => {
+    const idx = profile.titlesUnlocked.indexOf(profile.currentTitle);
+    const newIdx = (idx + 1) % profile.titlesUnlocked.length;
+    profile.currentTitle = profile.titlesUnlocked[newIdx];
+    saveProfile(profile);
+    audio.playButtonClick();
+    populateProfile();
+  });
+}
+
+// === Formations ===
+function spawnFormation(wave: number) {
+  const formation = pickFormation(wave);
+  activeFormation = {
+    formation,
+    targetsRemaining: new Set(formation.pylonIndices),
+    startTime: gameTime,
+    announced: false,
+  };
+
+  // Show formation announcement
+  const entity = uiEntities['formation'];
+  if (entity) entity.object3D!.visible = true;
+  updateFormationDisplay();
+
+  audio.playWaveStart(wave);
+  showToast(`FORMATION: ${formation.name}!`);
+}
+
+function updateFormationDisplay() {
+  if (!activeFormation) return;
+  const doc = getDoc('formation');
+  if (!doc) return;
+  const f = activeFormation.formation;
+  setText(doc, 'form-name', f.name);
+  setText(doc, 'form-desc', f.description);
+  setText(doc, 'form-bonus', `+${f.bonusPoints} BONUS`);
+  setText(doc, 'form-remaining', `${activeFormation.targetsRemaining.size} target${activeFormation.targetsRemaining.size !== 1 ? 's' : ''} remaining`);
+}
+
+// === Level Up Display ===
+function showLevelUp(level: number, xpEarned: number, rewards: LevelReward[]) {
+  const entity = uiEntities['levelup'];
+  if (entity) entity.object3D!.visible = true;
+  levelUpTimer = 4; // show for 4 seconds
+
+  const doc = getDoc('levelup');
+  if (!doc) return;
+  setText(doc, 'lvlup-level', `LV.${level}`);
+  setText(doc, 'lvlup-xp', `+${xpEarned} XP`);
+
+  for (let i = 0; i < 3; i++) {
+    if (rewards[i]) {
+      setText(doc, `lvlup-reward-${i}`, `UNLOCKED: ${rewards[i].name}`);
+    } else {
+      setText(doc, `lvlup-reward-${i}`, '');
+    }
   }
 }
 

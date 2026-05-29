@@ -28,6 +28,16 @@
     font-weight: bold;
     margin-top: 0.8;
   }
+  .go-xp {
+    font-size: 1.6;
+    color: #00ff88;
+    margin-top: 0.3;
+  }
+  .go-level {
+    font-size: 1.4;
+    color: #ffcc00;
+    margin-top: 0.2;
+  }
   .btn {
     margin-top: 1.5;
     padding-top: 0.8;
@@ -62,10 +72,13 @@
 <div class="go-panel">
   <span id="go-title" class="go-title">GAME OVER</span>
   <span id="go-score" class="go-score">Score: 0</span>
+  <span id="go-xp" class="go-xp"></span>
+  <span id="go-level" class="go-level"></span>
   <span id="go-hits" class="go-stat">Hits: 0</span>
   <span id="go-accuracy" class="go-stat">Accuracy: 0%</span>
   <span id="go-combo" class="go-stat">Max Combo: 0x</span>
   <span id="go-mode" class="go-stat">Mode: CLASSIC</span>
+  <span id="go-wave" class="go-stat"></span>
   <div id="btn-rematch" class="btn"><span class="btn-text">REMATCH</span></div>
   <div id="btn-title" class="title-btn"><span class="title-text">TITLE SCREEN</span></div>
 </div>

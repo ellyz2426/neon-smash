@@ -1,4 +1,4 @@
-<!-- ui/title.uikitml — Title screen (Round 3: added Challenge & Tutorial buttons) -->
+<!-- ui/title.uikitml — Title screen (Round 5: profile level + profile button) -->
 <style>
   .title-panel {
     display: flex;
@@ -22,6 +22,11 @@
     font-size: 1.8;
     color: #888888;
     margin-top: 0.5;
+  }
+  .player-info {
+    font-size: 1.4;
+    color: #ffcc00;
+    margin-top: 0.4;
   }
   .btn {
     margin-top: 1.5;
@@ -93,10 +98,26 @@
     font-size: 1.3;
     color: #00ff88;
   }
+  .btn-profile {
+    padding-top: 0.6;
+    padding-bottom: 0.6;
+    padding-left: 1.5;
+    padding-right: 1.5;
+    background-color: rgba(255, 204, 0, 0.1);
+    border-color: #ffcc00;
+    border-width: 0.06;
+    border-radius: 0.6;
+    cursor: pointer;
+  }
+  .btn-profile-text {
+    font-size: 1.3;
+    color: #ffcc00;
+  }
 </style>
 <div class="title-panel">
   <span class="game-title">NEON SMASH</span>
   <span class="subtitle">HOLODECK TARGET ARENA</span>
+  <span id="title-player-info" class="player-info"></span>
   <div id="btn-play" class="btn"><span class="btn-text">PLAY</span></div>
   <div id="btn-challenge" class="btn-challenge"><span class="btn-challenge-text">DAILY CHALLENGE</span></div>
   <div class="btn-row">
@@ -112,5 +133,6 @@
   <div class="btn-row">
     <div id="btn-tutorial" class="btn-tutorial"><span class="btn-tutorial-text">TRAINING</span></div>
     <div id="btn-history" class="btn-small"><span class="btn-small-text">HISTORY</span></div>
+    <div id="btn-profile" class="btn-profile"><span class="btn-profile-text">PROFILE</span></div>
   </div>
 </div>

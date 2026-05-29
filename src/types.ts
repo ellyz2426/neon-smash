@@ -2,7 +2,7 @@
 import { Vector3 } from '@iwsdk/core';
 
 // === Game States ===
-export type GameState = 'title' | 'modeselect' | 'difficulty' | 'countdown' | 'playing' | 'paused' | 'gameover' | 'leaderboard' | 'achievements' | 'settings' | 'help' | 'stats' | 'skins' | 'challenge' | 'tutorial' | 'history';
+export type GameState = 'title' | 'modeselect' | 'difficulty' | 'countdown' | 'playing' | 'paused' | 'gameover' | 'leaderboard' | 'achievements' | 'settings' | 'help' | 'stats' | 'skins' | 'challenge' | 'tutorial' | 'history' | 'profile';
 
 // === Target Types ===
 export enum TargetType {
@@ -41,6 +41,7 @@ export enum GameMode {
   Precision = 'precision',
   Endless = 'endless',
   BossWave = 'bosswave',
+  Zen = 'zen',
 }
 
 export const MODE_NAMES: Record<GameMode, string> = {
@@ -49,6 +50,7 @@ export const MODE_NAMES: Record<GameMode, string> = {
   [GameMode.Precision]: 'PRECISION',
   [GameMode.Endless]: 'ENDLESS',
   [GameMode.BossWave]: 'BOSS WAVE',
+  [GameMode.Zen]: 'ZEN',
 };
 
 export const MODE_DESCRIPTIONS: Record<GameMode, string> = {
@@ -57,6 +59,7 @@ export const MODE_DESCRIPTIONS: Record<GameMode, string> = {
   [GameMode.Precision]: '30 targets. Accuracy is everything.',
   [GameMode.Endless]: 'Infinite waves. How long can you last?',
   [GameMode.BossWave]: 'Giant boss targets with weak points.',
+  [GameMode.Zen]: 'No pressure. No bombs. Just smash.',
 };
 
 // === Difficulty ===
@@ -163,6 +166,17 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'wave_10', name: 'Survivor', description: 'Reach wave 10 in Endless', unlocked: false },
   { id: 'no_miss_wave5', name: 'Sharpshooter Elite', description: 'Complete 5 waves without a miss', unlocked: false },
   { id: 'total_1000', name: 'Thousand Smashes', description: 'Smash 1,000 total targets', unlocked: false },
+  // Round 5 achievements
+  { id: 'level_5', name: 'Rising Star', description: 'Reach level 5', unlocked: false },
+  { id: 'level_10', name: 'Veteran', description: 'Reach level 10', unlocked: false },
+  { id: 'level_25', name: 'Elite', description: 'Reach level 25', unlocked: false },
+  { id: 'level_50', name: 'Grandmaster', description: 'Reach level 50', unlocked: false },
+  { id: 'formation_first', name: 'Formation Breaker', description: 'Clear a target formation', unlocked: false },
+  { id: 'formation_10', name: 'Pattern Master', description: 'Clear 10 formations', unlocked: false },
+  { id: 'zen_5m', name: 'Inner Peace', description: 'Play Zen mode for 5 minutes', unlocked: false },
+  { id: 'zen_15m', name: 'Deep Focus', description: 'Play Zen mode for 15 minutes', unlocked: false },
+  { id: 'xp_1000', name: 'XP Hunter', description: 'Earn 1,000 total XP', unlocked: false },
+  { id: 'xp_10000', name: 'XP Legend', description: 'Earn 10,000 total XP', unlocked: false },
 ];
 
 // === Game State Manager ===
@@ -259,6 +273,11 @@ export class GameStateManager {
       case GameMode.BossWave:
         this.lives = 5;
         this.totalWaves = 5;
+        this.timeRemaining = 999;
+        break;
+      case GameMode.Zen:
+        this.lives = 999;
+        this.totalWaves = 999;
         this.timeRemaining = 999;
         break;
     }

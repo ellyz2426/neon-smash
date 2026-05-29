@@ -1,0 +1,10 @@
+<panel>
+  <container direction="column" align="center" padding="16">
+    <text id="lvlup-title" fontSize="24" fontWeight="bold" color="#ffcc00">LEVEL UP!</text>
+    <text id="lvlup-level" fontSize="32" fontWeight="bold" color="#00ffff">LV.2</text>
+    <text id="lvlup-reward-0" fontSize="14" color="#00ff88">---</text>
+    <text id="lvlup-reward-1" fontSize="14" color="#00ff88">---</text>
+    <text id="lvlup-reward-2" fontSize="14" color="#00ff88">---</text>
+    <text id="lvlup-xp" fontSize="12" color="#aaaaaa">+100 XP</text>
+  </container>
+</panel>

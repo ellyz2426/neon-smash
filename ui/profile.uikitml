@@ -1,0 +1,42 @@
+<panel>
+  <container direction="column" align="center" padding="20">
+    <text id="prof-title" fontSize="28" fontWeight="bold" color="#00ffff">PROFILE</text>
+    <container direction="column" align="center" padding="10" marginTop="12">
+      <text id="prof-name" fontSize="22" color="#ffffff">PLAYER</text>
+      <text id="prof-title-label" fontSize="16" color="#ffcc00">Rookie</text>
+    </container>
+    <container direction="column" align="center" padding="8" marginTop="10">
+      <text id="prof-level" fontSize="24" fontWeight="bold" color="#00ffff">LV.1</text>
+      <text id="prof-xp-bar" fontSize="14" color="#aaaaaa">[----------]</text>
+      <text id="prof-xp-text" fontSize="12" color="#888888">0 / 100 XP</text>
+    </container>
+    <container direction="column" align="left" padding="8" marginTop="10">
+      <text fontSize="16" fontWeight="bold" color="#00ffff">UNLOCKED</text>
+      <text id="prof-skins" fontSize="13" color="#cccccc">Skins: 1/5</text>
+      <text id="prof-themes" fontSize="13" color="#cccccc">Arenas: 2/8</text>
+      <text id="prof-titles" fontSize="13" color="#cccccc">Titles: 1/7</text>
+    </container>
+    <container direction="column" align="left" padding="8" marginTop="8">
+      <text fontSize="16" fontWeight="bold" color="#00ffff">NEXT REWARDS</text>
+      <text id="prof-next-0" fontSize="13" color="#aaaaaa">---</text>
+      <text id="prof-next-1" fontSize="13" color="#aaaaaa">---</text>
+      <text id="prof-next-2" fontSize="13" color="#aaaaaa">---</text>
+    </container>
+    <container direction="column" align="center" padding="8" marginTop="10">
+      <text fontSize="14" fontWeight="bold" color="#ffcc00">SELECT TITLE</text>
+      <text id="prof-t-0" fontSize="12" color="#cccccc">---</text>
+      <text id="prof-t-1" fontSize="12" color="#cccccc">---</text>
+      <text id="prof-t-2" fontSize="12" color="#cccccc">---</text>
+      <text id="prof-t-3" fontSize="12" color="#cccccc">---</text>
+      <button id="btn-title-prev" width="80" height="32" color="#222244" borderColor="#00ffff" borderWidth="1">
+        <text fontSize="14" color="#00ffff">PREV</text>
+      </button>
+      <button id="btn-title-next" width="80" height="32" color="#222244" borderColor="#00ffff" borderWidth="1">
+        <text fontSize="14" color="#00ffff">NEXT</text>
+      </button>
+    </container>
+    <button id="btn-back-profile" width="140" height="36" color="#222244" borderColor="#ff4466" borderWidth="1" marginTop="10">
+      <text fontSize="14" color="#ff4466">BACK</text>
+    </button>
+  </container>
+</panel>

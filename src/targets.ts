@@ -28,6 +28,7 @@ export interface ActiveTarget {
 
 export class TargetSystem {
   targets: ActiveTarget[] = [];
+  expiredThisFrame: { pos: Vector3; config: TargetConfig }[] = [];
   private spawnTimer = 0;
   private waveTargetCount = 0;
   private waveTargetsSpawned = 0;
@@ -45,6 +46,7 @@ export class TargetSystem {
       case GameMode.Precision: return 30;
       case GameMode.Endless: return 8 + wave * 2;
       case GameMode.BossWave: return 3 + wave; // minions before boss
+      case GameMode.Zen: return 6 + wave; // gentle progression
       default: return 10;
     }
   }
@@ -64,6 +66,7 @@ export class TargetSystem {
       let w = TARGET_CONFIGS[t].spawnChance;
       if (t === TargetType.Bomb) w *= diffCfg.bombChanceMult;
       if (mode === GameMode.Precision && t === TargetType.Bomb) w = 0; // no bombs in precision
+      if (mode === GameMode.Zen && t === TargetType.Bomb) w = 0; // no bombs in zen
       weights.push(w);
     });
 
@@ -166,6 +169,7 @@ export class TargetSystem {
   update(dt: number, difficulty: Difficulty, mode: GameMode, wave: number,
          pylonPositions: Vector3[], scene: any, spawnEnabled: boolean): void {
     const diffCfg = DIFFICULTY_CONFIGS[difficulty];
+    this.expiredThisFrame = []; // reset each frame
 
     // Spawn new targets
     if (spawnEnabled && this.waveTargetsSpawned < this.waveTargetCount) {
@@ -233,6 +237,7 @@ export class TargetSystem {
 
       // Lifetime expiry
       if (target.age >= target.lifetime) {
+        this.expiredThisFrame.push({ pos: target.group.position.clone(), config: target.config });
         this.removeTarget(target, scene);
       }
     }
